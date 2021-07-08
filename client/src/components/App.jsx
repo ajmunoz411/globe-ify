@@ -5,15 +5,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import axios from 'axios';
-// import { Swiper, SwiperSlide } from 'swiper/react';
-// import SwiperCore, { Navigation } from 'swiper';
-// import 'swiper/swiper.min.css';
-// import 'swiper/components/navigation/navigation.min.css';
 import Map from './Map';
 import Track from './Track';
 import Graph from './Graph';
-
-// SwiperCore.use([Navigation]);
 
 const App = () => {
   const [country, setCountry] = useState({ name: 'Global', code: 'global' });
@@ -79,34 +73,54 @@ const App = () => {
         }
       });
     });
-    const featTots = Object.entries(featuresTotals);
+    const featuresTotalsArr = Object.entries(featuresTotals);
+
     const averageFeats = {};
     const count = 5;
-    featTots.forEach((feature) => {
+    featuresTotalsArr.forEach((feature) => {
       averageFeats[feature[0]] = feature[1] / count;
     });
     const graphFeats = [];
     const theoryFeats = {};
+
     console.log('averageFeats', averageFeats);
     graphFeats.push(averageFeats.acousticness * 10);
     graphFeats.push(averageFeats.danceability * 10);
     graphFeats.push(averageFeats.duration_ms / 1000 / 60);
-    // graphFeats.push(averageFeats.duration_ms /= 60);
     graphFeats.push(averageFeats.energy * 10);
     graphFeats.push(averageFeats.instrumentalness * 1000);
-    theoryFeats.key = Math.round(averageFeats.key);
     graphFeats.push(averageFeats.liveness * 10);
     graphFeats.push(averageFeats.loudness + 10);
-    theoryFeats.mode = Math.round(averageFeats.mode);
     graphFeats.push(averageFeats.speechiness * 10);
     graphFeats.push(averageFeats.tempo / 20);
     graphFeats.push(averageFeats.valence * 10);
-    // console.log('averageFeats', averageFeats);
-    // const finalFeatData = Object.values(averageFeats);
-    // setFeatData([...finalFeatData]);
-    theoryFeats.time_signature = averageFeats.time_signature;
-    theoryFeats.tempo = averageFeats.tempo;
-    console.log('graphFeats', graphFeats);
+
+    const keys = {
+      0: 'C',
+      1: 'C#',
+      2: 'D',
+      3: 'D#',
+      4: 'E',
+      5: 'F',
+      6: 'F#',
+      7: 'G',
+      8: 'G#',
+      9: 'A',
+      10: 'A#',
+      11: 'B',
+    };
+
+    const modes = {
+      0: 'Minor',
+      1: 'Major',
+    };
+
+    theoryFeats['Key'] = keys[Math.round(averageFeats.key) - 1];
+    theoryFeats['Mode'] = modes[Math.round(averageFeats.mode)];
+    theoryFeats['Meter'] = averageFeats.time_signature;
+    theoryFeats['BPM'] = Math.round(averageFeats.tempo);
+
+    // console.log('graphFeats', graphFeats);
     setFeatData([...graphFeats]);
     const theoryArr = Object.entries(theoryFeats);
     setTheoryData([...theoryArr]);
@@ -130,25 +144,14 @@ const App = () => {
         </Row>
         <h4>Top Songs</h4>
         <Container>
-          {/* <Swiper
-            slidesPerView={3}
-            spaceBetween={5}
-            navigation
-            className="songs-swiper"
-          > */}
-          {/* <div> */}
           {data.map((song, i) => (
-            // <SwiperSlide key={i}>
             <Track
               song={song}
               setPlayingTrack={setPlayingTrack}
               playTrackId={playingTrack}
               key={i}
             />
-            // </SwiperSlide>
           ))}
-          {/* </Swiper> */}
-          {/* </div> */}
         </Container>
         <h4>Audio Features</h4>
         <Container>
@@ -167,24 +170,3 @@ const App = () => {
   );
 };
 export default App;
-
-{/* <table className="tracks-table">
-  <thead>
-    <tr>
-      <th>Rank</th>
-      <th>Track</th>
-      <th>Artist</th>
-      <th>Streams</th>
-    </tr>
-  </thead>
-  <tbody>
-    {data.map((track, i) => (
-      <tr key={i}>
-        <td className="track-rank">{track.rank}</td>
-        <td className="track-name">{track.track}</td>
-        <td className="track-artist">{track.artist}</td>
-        <td className="track-streams">{track.streams}</td>
-      </tr>
-    ))}
-  </tbody>
-</table> */}

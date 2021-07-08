@@ -1,36 +1,21 @@
 import React, { useState, useEffect } from 'react';
-// import Chart from 'chart.js';
-import { Bar, PolarArea, Radar } from 'react-chartjs-2';
-
-
-
-// const options = {
-//   scales: {
-//     yAxes: [
-//       {
-//         ticks: {
-//           beginAtZero: true,
-//         },
-//       },
-//     ],
-//   },
-// };
+import { PolarArea } from 'react-chartjs-2';
 
 const Graph = (props) => {
-  // <PolarArea data={data} options={options} />
-  // let featData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-  let featData = [];
-  if (props.featData) {
-    featData = props.featData;
-    // console.log('props.featData', props.featData);
-  };
+  const { featData } = props;
+  let featDataArr = [];
+
+  if (featData) {
+    featDataArr = featData;
+  }
+
   const data = {
     labels: ['Acousticness', 'Danceability', 'Duration(mins)', 'Energy', 'Instrumentalness', 'Liveness', 'Loudness', 'Speechiness', 'Tempo', 'Valence'],
+
     datasets: [
       {
         label: 'Average',
-        // data: [1, 5, 6, 2, 4, 6, 4, 2, 10, 1],
-        data: featData,
+        data: featDataArr,
         backgroundColor: [
           'rgba(171, 222, 230, 1)',
           'rgba(203, 170, 203, 1)',

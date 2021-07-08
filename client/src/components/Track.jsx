@@ -11,11 +11,6 @@ const Track = (props) => {
     id,
   } = song;
 
-  // handlePlay = () => {
-
-  // }
-  // const [clicked, setClicked] = useState(false);
-
   let player;
   if (playTrackId !== id) {
     player = null;
@@ -25,7 +20,6 @@ const Track = (props) => {
     );
   }
 
-  // console.log('url', url);
   return (
     <div className="track-info">
       <div>
