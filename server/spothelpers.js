@@ -5,9 +5,51 @@ const config = require('../config');
 
 const spotHelpers = {
   getTrack: (req, res) => {
+    const { id } = req.params;
     const options = {
       method: 'get',
-      url: 'https://api.spotify.com/v1/tracks/2TpxZ7JUBn3uw46aR7qd6V',
+      url: `https://api.spotify.com/v1/tracks/${id}`,
+      headers: {
+        Authorization: `Bearer ${config.TOKEN}`,
+      },
+    };
+
+    axios(options)
+      .then((response) => {
+        res.status(200).send(response.data);
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+  },
+
+  getTracksList: (req, res) => {
+    // console.log('hi from trackslist');
+    const { list } = req.params;
+    // console.log('list', list);
+    const options = {
+      method: 'get',
+      url: `https://api.spotify.com/v1/tracks?ids=${list}`,
+      headers: {
+        Authorization: `Bearer ${config.TOKEN}`,
+      },
+    };
+
+    axios(options)
+      .then((response) => {
+        res.status(200).send(response.data);
+      })
+      .catch((err) => {
+        res.status(400).send(err);
+      });
+  },
+
+  getTracksFeatures: (req, res) => {
+    const { list } = req.params;
+
+    const options = {
+      method: 'get',
+      url: `https://api.spotify.com/v1/audio-features?ids=${list}`,
       headers: {
         Authorization: `Bearer ${config.TOKEN}`,
       },

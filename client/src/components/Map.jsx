@@ -22,7 +22,7 @@ const Map = (props) => {
   });
 
   const onMapClick = (country) => {
-    setCountry(country.name);
+    setCountry(country);
     setCenter({
       lat: country.pos[0],
       lng: country.pos[1],
