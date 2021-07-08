@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react/no-array-index-key */
+import React, { useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-// import { Marker } from '@react-google-maps/api';
 import countries from './Countries';
 import config from '../../../config';
 

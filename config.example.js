@@ -1,3 +1,4 @@
 module.exports = {
   GMAPS: 'YOUR GOOGLE API TOKEN HERE',
+  SPOT: 'YOUR SPOTIFY CODE HERE',
 };
