@@ -7,8 +7,8 @@ import config from '../../../config';
 
 const Map = (props) => {
   // const { setCountry, setClicks } = props;
-  const { setCountryOne, setCountryTwo } = props;
-  const [clicks, setClicks] = useState(0);
+  const { setCountryOne, setCountryTwo, clicks, setClicks } = props;
+  // const [clicks, setClicks] = useState(0);
 
   const containerStyle = {
     width: '850px',
@@ -43,6 +43,7 @@ const Map = (props) => {
       mapContainerStyle={containerStyle}
       center={center}
       zoom={1}
+      className="main-map"
     >
       {countries.map((curCountry, i) => (
         <Marker

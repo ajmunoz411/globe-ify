@@ -1,5 +1,65 @@
+.main-container {
+  max-width: 1250px;
+  justify-content: center;
+  margin-left: 100px;
+  margin-right: 100px;
+  margin-top: 20px;
+  margin-bottom: 35px;
+}
+
 .songs-container {
   height: 250px;
   overflow-y: scroll;
   margin-top: 15px;
+}
+
+.main-title {
+  /* align-items: flex-end; */
+  justify-content: center;
+  justify-content: flex-end;
+  align-self: center;
+  margin-top: 50px;
+  margin-left: 100px;
+  /* margin-left: 500px; */
+  /* width: 100%; */
+}
+
+.title-row {
+  background-color: rgba(255, 255, 181, 1)
+}
+
+.map-row {
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(243, 176, 195, 1);
+}
+
+.reset-button {
+  margin-top: 10px;
+  margin-bottom: 12px;
+  max-width: 100px;
+  /* background-color: white; */
+}
+
+.fa-globe-americas {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  margin-left: 25px;
+}
+
+.select-title {
+  margin-top: 20px;
+  /* background-color: rgba(171, 222, 230, 1) */
+}
+
+.select-reset {
+  background-color: rgba(171, 222, 230, 1)
+}
+
+.top-songs {
+  background-color: rgba(236, 213, 227, 1)
+}
+
+.theory-row {
+  background-color: rgba(198, 219, 218, 1)
 }

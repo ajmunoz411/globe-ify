@@ -13,15 +13,20 @@ import Map from './Map';
 import Graph2 from './Graph2';
 import QuantityDropdown from './QuantityDropdown';
 import Songs from './Songs';
+import Theory from './Theory';
 
 const App2 = () => {
-  const [countryOne, setCountryOne] = useState({ name: 'Global', code: 'global' });
+  const [countryOne, setCountryOne] = useState({ name: 'World', code: 'global' });
   const [dbDataOne, setDbDataOne] = useState([]);
   const [quantityOne, setQuantityOne] = useState(5);
+  const [theoryDataOne, setTheoryDataOne] = useState([]);
 
   const [countryTwo, setCountryTwo] = useState(null);
   const [dbDataTwo, setDbDataTwo] = useState([]);
   const [quantityTwo, setQuantityTwo] = useState(5);
+  const [theoryDataTwo, setTheoryDataTwo] = useState([]);
+
+  const [clicks, setClicks] = useState(0);
 
   // GET DB DATA FOR FIRST COUNTRY
   useEffect(() => {
@@ -49,63 +54,104 @@ const App2 = () => {
 
   const resetCountries = (e) => {
     e.preventDefault();
-    setCountryOne({ name: 'Global', code: 'global' });
+    setCountryOne({ name: 'World', code: 'global' });
     setCountryTwo(null);
+    setClicks(0);
   };
 
   return (
     <>
       <Container fluid className="main-container">
-        <Row><h3>Global Music</h3></Row>
-        <Row><h4>Select a country</h4></Row>
-        <Row>
-          <Map setCountryOne={setCountryOne} setCountryTwo={setCountryTwo} />
+        {/* <Row className="main-title"><h3>Global Music</h3></Row> */}
+        <Row className="title-row">
+          <Col>
+            <i className="fas fa-globe-americas fa-8x" />
+          </Col>
+          <Col xs={8}>
+            <h3 className="main-title">Global Music</h3>
+          </Col>
         </Row>
-        <Row>
-          <Button onClick={resetCountries} type="button">Reset Countries</Button>
+        {/* <Row className="main-title"><h4>Select a country (or two)</h4></Row> */}
+        <Row className="map-row">
+          <Map setCountryOne={setCountryOne} setCountryTwo={setCountryTwo} clicks={clicks} setClicks={setClicks}/>
         </Row>
-        <Row>
+        <Row className="select-reset">
+        {/* <div className="select-reset"> */}
+          <h4 className="select-title">Select a country (or two)</h4>
+          <Button onClick={resetCountries} variant="light" type="button" size="sm" className="reset-button">Reset</Button>
+        {/* </div> */}
+          {/* <button onClick={resetCountries} type="button" className="reset-button">Reset</button> */}
+        </Row>
+        <Row className="top-songs">
           <Col>
             <h3>
-              Selected Country:
-              {` ${countryOne.name}`}
+              {` ${countryOne.name}'s Top ${quantityOne} Songs`}
             </h3>
           </Col>
           {countryTwo && (
             <Col>
               <h3>
-                Selected Country Two:
-                {` ${countryTwo.name}`}
+                {` ${countryTwo.name}'s Top ${quantityTwo} Songs`}
               </h3>
             </Col>
           )}
         </Row>
-        <Row>
+        <Row className="top-songs">
           <Col>
-            <h4>Top Songs</h4>
+            {/* <h4>Top Songs</h4> */}
             <QuantityDropdown setDataQuantity={setQuantityOne} />
             <Songs dbData={dbDataOne} />
           </Col>
           {countryTwo && (
             <Col>
-              <h4>Top Songs</h4>
+              {/* <h4>Top Songs</h4> */}
               <QuantityDropdown setDataQuantity={setQuantityTwo} />
               <Songs dbData={dbDataTwo} />
+            </Col>
+          )}
+        </Row>
+        <Row className="theory-row">
+          <Col>
+            <Theory data={theoryDataOne} />
+          </Col>
+          {countryTwo && (
+            <Col>
+              <Theory data={theoryDataTwo} />
             </Col>
           )}
         </Row>
         <Row>
           <Col>
             <h4>Audio Features</h4>
-            <Graph2 dbData={dbDataOne} quantity={quantityOne} />
+            {/* <Graph2 dbData={dbDataOne} quantity={quantityOne} setTheoryData={setTheoryDataOne} /> */}
+            <Graph2
+              dbDataOne={dbDataOne}
+              quantityOne={quantityOne}
+              setTheoryDataOne={setTheoryDataOne}
+              // codeOne={countryOne.code}
+              dbDataTwo={dbDataTwo}
+              quantityTwo={quantityTwo}
+              setTheoryDataTwo={setTheoryDataTwo}
+              // codeTwo={countryTwo.code}
+            />
+          </Col>
+          {/* {countryTwo && (
+            <Col>
+              <h4>Audio Features</h4>
+              <Graph2 dbData={dbDataTwo} quantity={quantityTwo} setTheoryData={setTheoryDataTwo} />
+            </Col>
+          )} */}
+        </Row>
+        {/* <Row>
+          <Col>
+            <Theory data={theoryDataOne} />
           </Col>
           {countryTwo && (
             <Col>
-              <h4>Audio Features</h4>
-              <Graph2 dbData={dbDataTwo} quantity={quantityTwo} />
+              <Theory data={theoryDataTwo} />
             </Col>
           )}
-        </Row>
+        </Row> */}
       </Container>
     </>
   );
