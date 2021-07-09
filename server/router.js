@@ -3,7 +3,7 @@ const dbhelpers = require('../db/dbhelpers');
 const spothelpers = require('./spothelpers');
 
 router
-  .get('/db/:country', dbhelpers.getTracks)
+  .get('/db/:country/:quantity', dbhelpers.getTracks)
   .get('/track', spothelpers.getTrack)
   .get('/list/tracks/:list', spothelpers.getTracksList)
   .get('/features/:list', spothelpers.getTracksFeatures)

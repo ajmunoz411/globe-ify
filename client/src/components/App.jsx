@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Container from 'react-bootstrap/Container';
+import Dropdown from 'react-bootstrap/Dropdown';
+import DropdownButton from 'react-bootstrap/DropdownButton';
 import Row from 'react-bootstrap/Row';
 import axios from 'axios';
 import Map from './Map';
@@ -16,16 +18,17 @@ const App = () => {
   const [playingTrack, setPlayingTrack] = useState(null);
   const [featData, setFeatData] = useState([]);
   const [theoryData, setTheoryData] = useState([]);
+  const [quantity, setQuantity] = useState('5');
 
   useEffect(() => {
-    axios.get(`/spotify/db/${country.code}`)
+    axios.get(`/spotify/db/${country.code}/${quantity}`)
       .then((dbData) => {
         setData([...dbData.data]);
       })
       .catch((err) => {
         console.log('error getting tracks', err);
       });
-  }, [country]);
+  }, [country, quantity]);
 
   useEffect(() => {
     // console.log('data', data);
@@ -143,6 +146,12 @@ const App = () => {
           </h3>
         </Row>
         <h4>Top Songs</h4>
+        <DropdownButton className="dropdown-quantity-button" title={quantity} variant="outline-dark" size="sm">
+          <Dropdown.Item onClick={() => setQuantity('5')}>5</Dropdown.Item>
+          <Dropdown.Item onClick={() => setQuantity('10')}>10</Dropdown.Item>
+          <Dropdown.Item onClick={() => setQuantity('25')}>25</Dropdown.Item>
+          <Dropdown.Item onClick={() => setQuantity('50')}>50</Dropdown.Item>
+        </DropdownButton>
         <Container>
           {data.map((song, i) => (
             <Track
