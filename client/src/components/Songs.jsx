@@ -10,7 +10,7 @@ const Songs = ({ dbData }) => {
   const [playingTrack, setPlayingTrack] = useState(null);
 
   return (
-    <>
+    <div className="songs-container">
       {data.map((song, i) => (
         <Track
           song={song}
@@ -19,8 +19,8 @@ const Songs = ({ dbData }) => {
           key={i}
         />
       ))}
-    </>
-  )
+    </div>
+  );
 };
 
 export default Songs;

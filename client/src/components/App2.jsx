@@ -4,6 +4,8 @@ import Container from 'react-bootstrap/Container';
 // import Dropdown from 'react-bootstrap/Dropdown';
 // import DropdownButton from 'react-bootstrap/DropdownButton';
 import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import Map from './Map';
 // import Track from './Track';
@@ -45,35 +47,82 @@ const App2 = () => {
     }
   }, [countryTwo, quantityTwo]);
 
+  const resetCountries = (e) => {
+    e.preventDefault();
+    setCountryOne({ name: 'Global', code: 'global' });
+    setCountryTwo(null);
+  };
+
   return (
     <>
-      <h3>Global Music</h3>
-      <h4>Select a country</h4>
-      <Map setCountryOne={setCountryOne} setCountryTwo={setCountryTwo} />
-      <h3>
-        Selected Country:
-        {` ${countryOne.name}`}
-      </h3>
-      <h4>Top Songs</h4>
-      <QuantityDropdown setDataQuantity={setQuantityOne} />
-      <Songs dbData={dbDataOne} />
-      <h4>Audio Features</h4>
-      <Graph2 dbData={dbDataOne} quantity={quantityOne} />
-      {countryTwo && (
-        <>
-          <h3>
-            Selected Country Two:
-            {` ${countryTwo.name}`}
-          </h3>
-          <h4>Top Songs</h4>
-          <QuantityDropdown setDataQuantity={setQuantityTwo} />
-          <Songs dbData={dbDataTwo} />
-          <h4>Audio Features</h4>
-          <Graph2 dbData={dbDataTwo} quantity={quantityTwo} />
-        </>
-      )}
+      <Container fluid className="main-container">
+        <Row><h3>Global Music</h3></Row>
+        <Row><h4>Select a country</h4></Row>
+        <Row>
+          <Map setCountryOne={setCountryOne} setCountryTwo={setCountryTwo} />
+        </Row>
+        <Row>
+          <Button onClick={resetCountries} type="button">Reset Countries</Button>
+        </Row>
+        <Row>
+          <Col>
+            <h3>
+              Selected Country:
+              {` ${countryOne.name}`}
+            </h3>
+          </Col>
+          {countryTwo && (
+            <Col>
+              <h3>
+                Selected Country Two:
+                {` ${countryTwo.name}`}
+              </h3>
+            </Col>
+          )}
+        </Row>
+        <Row>
+          <Col>
+            <h4>Top Songs</h4>
+            <QuantityDropdown setDataQuantity={setQuantityOne} />
+            <Songs dbData={dbDataOne} />
+          </Col>
+          {countryTwo && (
+            <Col>
+              <h4>Top Songs</h4>
+              <QuantityDropdown setDataQuantity={setQuantityTwo} />
+              <Songs dbData={dbDataTwo} />
+            </Col>
+          )}
+        </Row>
+        <Row>
+          <Col>
+            <h4>Audio Features</h4>
+            <Graph2 dbData={dbDataOne} quantity={quantityOne} />
+          </Col>
+          {countryTwo && (
+            <Col>
+              <h4>Audio Features</h4>
+              <Graph2 dbData={dbDataTwo} quantity={quantityTwo} />
+            </Col>
+          )}
+        </Row>
+      </Container>
     </>
   );
 };
 
 export default App2;
+
+// {countryTwo && (
+//   <>
+//     {/* <h3>
+//       Selected Country Two:
+//       {` ${countryTwo.name}`}
+//     </h3> */}
+//     {/* <h4>Top Songs</h4>
+//     <QuantityDropdown setDataQuantity={setQuantityTwo} />
+//     <Songs dbData={dbDataTwo} /> */}
+//     {/* <h4>Audio Features</h4>
+//     <Graph2 dbData={dbDataTwo} quantity={quantityTwo} /> */}
+//   </>
+// )}

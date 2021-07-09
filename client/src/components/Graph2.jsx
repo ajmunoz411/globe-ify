@@ -136,7 +136,10 @@ const Graph2 = (props) => {
   if (featData.length > 0) {
     return (
       <>
-        <PolarArea data={graphData} />
+        {/* <div className="graph-container" style={{ height: '40vh', width: '100%' }}> */}
+          {/* <PolarArea data={graphData} options={{ maintainAspectRatio: false }} /> */}
+          <PolarArea data={graphData} />
+        {/* </div> */}
         <Theory data={theoryData} />
       </>
     );

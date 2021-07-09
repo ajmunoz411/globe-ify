@@ -23,13 +23,8 @@ const Track = (props) => {
   return (
     <div className="track-info">
       <div>
-        {rank}
-        -
-        {track}
-        -
-        {artist}
-        -
-        {streams}
+        {rank}. <b>{track}</b> - <em>{artist}</em><br></br>
+        {streams} Streams ||
         <i className="far fa-play-circle" onClick={() => setPlayingTrack(id)} onKeyDown={() => setPlayingTrack(id)} role="button" tabIndex="0" label="play" />
       </div>
       {player}

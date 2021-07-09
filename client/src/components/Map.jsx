@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import countries from './Countries';
 import config from '../../../config';
-import TopSongs from './TopSongs';
+// import TopSongs from './TopSongs';
 
 const Map = (props) => {
   // const { setCountry, setClicks } = props;
@@ -11,8 +11,8 @@ const Map = (props) => {
   const [clicks, setClicks] = useState(0);
 
   const containerStyle = {
-    width: '500px',
-    height: '500px',
+    width: '850px',
+    height: '550px',
   };
 
   const [center, setCenter] = useState({
