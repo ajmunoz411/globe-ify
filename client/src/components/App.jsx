@@ -19,6 +19,7 @@ const App = () => {
   const [featData, setFeatData] = useState([]);
   const [theoryData, setTheoryData] = useState([]);
   const [quantity, setQuantity] = useState('5');
+  // const [clicks, setClicks] = useState(0);
 
   useEffect(() => {
     axios.get(`/spotify/db/${country.code}/${quantity}`)
