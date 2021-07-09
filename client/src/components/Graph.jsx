@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { PolarArea } from 'react-chartjs-2';
 
 const Graph = (props) => {
+  // console.log('hello from graph');
   const { featData } = props;
   let featDataArr = [];
 
@@ -36,7 +37,7 @@ const Graph = (props) => {
     ],
   };
 
-  if (featData) {
+  if (featDataArr.length > 0) {
     return (
       <PolarArea data={data} />
     );

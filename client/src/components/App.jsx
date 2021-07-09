@@ -10,17 +10,20 @@ import axios from 'axios';
 import Map from './Map';
 import Track from './Track';
 import Graph from './Graph';
+// import TopSongs from './TopSongs';
 
 const App = () => {
   const [country, setCountry] = useState({ name: 'Global', code: 'global' });
+  const [countryTwo, setCountryTwo] = useState(null);
   const [data, setData] = useState([]);
   const [features, setFeatures] = useState([]);
   const [playingTrack, setPlayingTrack] = useState(null);
   const [featData, setFeatData] = useState([]);
   const [theoryData, setTheoryData] = useState([]);
-  const [quantity, setQuantity] = useState('5');
+  const [quantity, setQuantity] = useState(5);
   // const [clicks, setClicks] = useState(0);
-
+  console.log('country', country);
+  console.log('countryTwo', countryTwo);
   useEffect(() => {
     axios.get(`/spotify/db/${country.code}/${quantity}`)
       .then((dbData) => {
@@ -54,6 +57,7 @@ const App = () => {
   }, [data]);
 
   useEffect(() => {
+    // console.log('features in second', features);
     const featuresTotals = {
       acousticness: 0,
       danceability: 0,
@@ -69,6 +73,7 @@ const App = () => {
       time_signature: 0,
       valence: 0,
     };
+    // console.log('featuresTotals', featuresTotals);
     features.forEach((featObj) => {
       const featArr = Object.entries(featObj);
       featArr.forEach((feature) => {
@@ -80,14 +85,14 @@ const App = () => {
     const featuresTotalsArr = Object.entries(featuresTotals);
 
     const averageFeats = {};
-    const count = 5;
+    const count = quantity;
     featuresTotalsArr.forEach((feature) => {
       averageFeats[feature[0]] = feature[1] / count;
     });
     const graphFeats = [];
     const theoryFeats = {};
 
-    console.log('averageFeats', averageFeats);
+    // console.log('averageFeats', averageFeats);
     graphFeats.push(averageFeats.acousticness * 10);
     graphFeats.push(averageFeats.danceability * 10);
     graphFeats.push(averageFeats.duration_ms / 1000 / 60);
@@ -130,28 +135,46 @@ const App = () => {
     setTheoryData([...theoryArr]);
   }, [features]);
 
+  // let graphTwo = 'TOES';
+  // useEffect(() => {
+  //   // graphTwo = (
+  //   //   <h4>Top Songs TWO</h4>
+  //   // );
+  //   // graphTwo = 'LOBSTER>';
+  //   console.log('HELLO');
+  //   graphTwo = 'LOBSTER';
+  // }, [countryTwo]);
+  // console.log('graphTwo', graphTwo);
+
   return (
     <div>
       <Container className="main-container">
         <Row className="main-header">
           <h3>GLOBAL MUSIC</h3>
         </Row>
-        <Row className="map">
+        <Row>
           <h4>Select A Country</h4>
-          <Map setCountry={setCountry} />
+          {/* <Map setCountry={setCountry} setClicks={setClicks} /> */}
+          <Map setCountry={setCountry} setCountryTwo={setCountryTwo} />
         </Row>
         <Row>
           <h3>
             Selected Country:
             {` ${country.name}`}
           </h3>
+          {countryTwo && (
+            <h3>
+              Selected Country Two:
+              {` ${countryTwo.name}`}
+            </h3>
+          )}
         </Row>
         <h4>Top Songs</h4>
         <DropdownButton className="dropdown-quantity-button" title={quantity} variant="outline-dark" size="sm">
-          <Dropdown.Item onClick={() => setQuantity('5')}>5</Dropdown.Item>
-          <Dropdown.Item onClick={() => setQuantity('10')}>10</Dropdown.Item>
-          <Dropdown.Item onClick={() => setQuantity('25')}>25</Dropdown.Item>
-          <Dropdown.Item onClick={() => setQuantity('50')}>50</Dropdown.Item>
+          <Dropdown.Item onClick={() => setQuantity(5)}>5</Dropdown.Item>
+          <Dropdown.Item onClick={() => setQuantity(10)}>10</Dropdown.Item>
+          <Dropdown.Item onClick={() => setQuantity(25)}>25</Dropdown.Item>
+          <Dropdown.Item onClick={() => setQuantity(50)}>50</Dropdown.Item>
         </DropdownButton>
         <Container>
           {data.map((song, i) => (
@@ -163,6 +186,8 @@ const App = () => {
             />
           ))}
         </Container>
+        {/* <TopSongs data={data} /> */}
+        {/* <TopSongs /> */}
         <h4>Audio Features</h4>
         <Container>
           <Graph featData={featData} />
@@ -175,6 +200,7 @@ const App = () => {
             {theory[1]}
           </div>
         ))}
+        {/* {graphTwo} */}
       </Container>
     </div>
   );

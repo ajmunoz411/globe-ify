@@ -3,9 +3,13 @@ import React, { useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import countries from './Countries';
 import config from '../../../config';
+import TopSongs from './TopSongs';
 
 const Map = (props) => {
-  const { setCountry } = props;
+  // const { setCountry, setClicks } = props;
+  const { setCountryOne, setCountryTwo } = props;
+  const [clicks, setClicks] = useState(0);
+
   const containerStyle = {
     width: '500px',
     height: '500px',
@@ -22,7 +26,12 @@ const Map = (props) => {
   });
 
   const onMapClick = (country) => {
-    setCountry(country);
+    if (clicks === 0) {
+      setCountryOne(country);
+    } else {
+      setCountryTwo(country);
+    }
+    setClicks(1);
     setCenter({
       lat: country.pos[0],
       lng: country.pos[1],
