@@ -27,6 +27,7 @@ const App2 = () => {
   const [theoryDataTwo, setTheoryDataTwo] = useState([]);
 
   const [clicks, setClicks] = useState(0);
+  // const [reset, setReset] = useState(false);
 
   // GET DB DATA FOR FIRST COUNTRY
   useEffect(() => {
@@ -57,6 +58,7 @@ const App2 = () => {
     setCountryOne({ name: 'World', code: 'global' });
     setCountryTwo(null);
     setClicks(0);
+    // setReset(true);
   };
 
   return (
@@ -68,7 +70,7 @@ const App2 = () => {
             <i className="fas fa-globe-americas fa-8x" />
           </Col>
           <Col xs={8}>
-            <h3 className="main-title">Global Music</h3>
+            <h3 className="main-title">Globe-ify</h3>
           </Col>
         </Row>
         {/* <Row className="main-title"><h4>Select a country (or two)</h4></Row> */}
@@ -78,7 +80,7 @@ const App2 = () => {
         <Row className="select-reset">
         {/* <div className="select-reset"> */}
           <h4 className="select-title">Select a country (or two)</h4>
-          <Button onClick={resetCountries} variant="light" type="button" size="sm" className="reset-button">Reset</Button>
+          <span><Button onClick={resetCountries} variant="light" type="button" size="lg" className="reset-button">Reset</Button></span>
         {/* </div> */}
           {/* <button onClick={resetCountries} type="button" className="reset-button">Reset</button> */}
         </Row>
@@ -120,7 +122,7 @@ const App2 = () => {
             </Col>
           )}
         </Row>
-        <Row>
+        <Row className="features-row">
           <Col>
             <h4>Audio Features</h4>
             {/* <Graph2 dbData={dbDataOne} quantity={quantityOne} setTheoryData={setTheoryDataOne} /> */}

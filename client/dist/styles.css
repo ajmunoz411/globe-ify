@@ -14,14 +14,11 @@
 }
 
 .main-title {
-  /* align-items: flex-end; */
   justify-content: center;
   justify-content: flex-end;
   align-self: center;
   margin-top: 50px;
   margin-left: 100px;
-  /* margin-left: 500px; */
-  /* width: 100%; */
 }
 
 .title-row {
@@ -38,7 +35,6 @@
   margin-top: 10px;
   margin-bottom: 12px;
   max-width: 100px;
-  /* background-color: white; */
 }
 
 .fa-globe-americas {
@@ -49,7 +45,6 @@
 
 .select-title {
   margin-top: 20px;
-  /* background-color: rgba(171, 222, 230, 1) */
 }
 
 .select-reset {

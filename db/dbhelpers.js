@@ -3,7 +3,6 @@ const db = require('./index');
 const dbhelpers = {
   getTracks: (req, res) => {
     const { country, quantity } = req.params;
-    // console.log('country', country);
     const queryStr = `SELECT * FROM "spotifyChart"."${country}" LIMIT ${quantity};`;
     db.query(queryStr, (err, data) => {
       if (err) {
