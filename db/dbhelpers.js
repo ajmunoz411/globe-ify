@@ -8,7 +8,6 @@ const dbhelpers = {
       if (err) {
         res.status(400).send(err);
       } else {
-        console.log('data.rows', data.rows);
         res.status(200).send(data.rows);
       }
     });

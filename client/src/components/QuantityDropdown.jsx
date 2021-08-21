@@ -18,7 +18,7 @@ const QuantityDropdown = (props) => {
       <Dropdown.Item onClick={() => setQuantity(25)}>25</Dropdown.Item>
       <Dropdown.Item onClick={() => setQuantity(50)}>50</Dropdown.Item>
     </DropdownButton>
-  )
+  );
 };
 
 export default QuantityDropdown;

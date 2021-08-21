@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import countries from './Countries';
 import config from '../../../config';
-// import TopSongs from './TopSongs';
 
 const Map = (props) => {
-  // const { setCountry, setClicks } = props;
-  const { setCountryOne, setCountryTwo, clicks, setClicks } = props;
-  // const [clicks, setClicks] = useState(0);
+  const {
+    setCountryOne,
+    setCountryTwo,
+    clicks,
+    setClicks,
+  } = props;
 
   const containerStyle = {
     width: '850px',

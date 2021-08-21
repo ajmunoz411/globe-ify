@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 const Track = (props) => {
   const { song, setPlayingTrack, playTrackId } = props;
@@ -23,8 +23,14 @@ const Track = (props) => {
   return (
     <div className="track-info">
       <div>
-        {rank}. <b>{track}</b> - <em>{artist}</em><br></br>
-        {streams} Streams ||
+        {rank}
+        .
+        <b>{track}</b>
+        -
+        <em>{artist}</em>
+        <br />
+        {streams}
+        Streams ||
         <i className="far fa-play-circle" onClick={() => setPlayingTrack(id)} onKeyDown={() => setPlayingTrack(id)} role="button" tabIndex="0" label="play" />
       </div>
       {player}
