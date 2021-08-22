@@ -11,7 +11,7 @@ import QuantityDropdown from './QuantityDropdown';
 import Songs from './Songs';
 import Theory from './Theory';
 
-const App2 = () => {
+const App = () => {
   const [countryOne, setCountryOne] = useState({ name: 'World', code: 'global' });
   const [dbDataOne, setDbDataOne] = useState([]);
   const [quantityOne, setQuantityOne] = useState(5);
@@ -46,8 +46,7 @@ const App2 = () => {
     }
   }, [countryTwo, quantityTwo]);
 
-  const resetCountries = (e) => {
-    e.preventDefault();
+  const resetCountries = () => {
     setCountryOne({ name: 'World', code: 'global' });
     setCountryTwo(null);
     setClicks(0);
@@ -130,4 +129,4 @@ const App2 = () => {
   );
 };
 
-export default App2;
+export default App;

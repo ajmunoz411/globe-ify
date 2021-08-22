@@ -1,7 +1,7 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import countries from './Countries';
+import countries from '../../../data/countryCodeCoord';
 import config from '../../../config';
 
 const Map = (props) => {
