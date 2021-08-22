@@ -3,3 +3,4 @@ package-lock.json
 config.js
 dataOrig
 dataClean
+bundle.js

@@ -1,4 +1,3 @@
-// const config = '../config.js';
 const axios = require('axios');
 const qs = require('qs');
 const config = require('../config');
@@ -24,9 +23,7 @@ const spotHelpers = {
   },
 
   getTracksList: (req, res) => {
-    // console.log('hi from trackslist');
     const { list } = req.params;
-    // console.log('list', list);
     const options = {
       method: 'get',
       url: `https://api.spotify.com/v1/tracks?ids=${list}`,
