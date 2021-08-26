@@ -24,28 +24,6 @@ const App = () => {
 
   const [clicks, setClicks] = useState(0);
 
-  useEffect(() => {
-    axios.get(`/spotify/db/${countryOne.code}/${quantityOne}`)
-      .then((dbData) => {
-        setDbDataOne([...dbData.data]);
-      })
-      .catch((err) => {
-        console.log('error getting ct1 tracks', err);
-      });
-  }, [countryOne, quantityOne]);
-
-  useEffect(() => {
-    if (countryTwo) {
-      axios.get(`/spotify/db/${countryTwo.code}/${quantityTwo}`)
-        .then((dbData) => {
-          setDbDataTwo([...dbData.data]);
-        })
-        .catch((err) => {
-          console.log('error getting ct2 tracks', err);
-        });
-    }
-  }, [countryTwo, quantityTwo]);
-
   const getCountries = (country, quantity, setter) => {
     axios.get(`/spotify/db/${country.code}/${quantity}`)
       .then((dbData) => {
@@ -55,6 +33,14 @@ const App = () => {
         console.log(`error getting ${country} tracks`, err);
       });
   };
+
+  useEffect(() => {
+    getCountries(countryOne, quantityOne, setDbDataOne);
+  }, [countryOne, quantityOne]);
+
+  useEffect(() => {
+    if (countryTwo) { getCountries(countryTwo, quantityTwo, setDbDataTwo); }
+  }, [countryTwo, quantityTwo]);
 
   const resetCountries = () => {
     setCountryOne({ name: 'World', code: 'global' });
