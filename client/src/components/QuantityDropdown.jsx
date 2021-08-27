@@ -12,7 +12,7 @@ const QuantityDropdown = (props) => {
   };
 
   const dropDownItem = (quantity) => (
-    <Dropdown.Item onClick={() => setQuantity(quantity)}>{quantity}</Dropdown.Item>
+    <Dropdown.Item key={quantity} onClick={() => setQuantity(quantity)}>{quantity}</Dropdown.Item>
   );
 
   const quants = [5, 10, 25, 50];
