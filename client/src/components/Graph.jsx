@@ -14,7 +14,7 @@ const Graph = (props) => {
 
   const [featData, setFeatData] = useState([]);
   const getAverages = (featsArr) => {
-    // console.log('featsArr', featsArr);
+    console.log('featsArr', featsArr);
     const featuresTotals = {
       acousticness: 0,
       danceability: 0,
@@ -32,23 +32,36 @@ const Graph = (props) => {
     };
 
     featsArr.forEach((featObj) => {
-      const featArr = Object.entries(featObj);
-      featArr.forEach((feature) => {
+      Object.entries(featObj).forEach((feature) => {
         if (featuresTotals[feature[0]] !== undefined) {
           featuresTotals[feature[0]] += feature[1];
         }
       });
     });
 
-    const featuresTotalsArr = Object.entries(featuresTotals);
+    // const featuresTotalsArr = Object.entries(featuresTotals);
 
     const averageFeats = {};
 
-    featuresTotalsArr.forEach((feature) => {
+    Object.entries(featuresTotals).forEach((feature) => {
       averageFeats[feature[0]] = feature[1] / quantityOne;
     });
+    // featuresTotalsArr.forEach((feature) => {
+    //   averageFeats[feature[0]] = feature[1] / quantityOne;
+    // });
+    console.log('averageFeats', averageFeats);
     const graphFeats = [];
     const theoryFeats = {};
+
+    // graphFeats.push(averageFeats.acousticness * 100);
+    // graphFeats.push(averageFeats.danceability * 100);
+    // graphFeats.push(averageFeats.energy * 100);
+    // graphFeats.push(averageFeats.instrumentalness * 100);
+    // graphFeats.push(averageFeats.liveness * 100);
+    // graphFeats.push((10 ** (averageFeats.loudness / 10)) * 100);
+    // graphFeats.push(averageFeats.speechiness * 100);
+    // graphFeats.push(averageFeats.valence * 100);
+    // console.log('graphFeats', graphFeats);
 
     graphFeats.push(averageFeats.acousticness * 10);
     graphFeats.push(averageFeats.danceability * 10);
