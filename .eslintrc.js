@@ -21,5 +21,6 @@ module.exports = {
     'react/prop-types': 'off',
     'no-console': 'off',
     'no-array-index-key': 'off',
+    'react/jsx-one-expression-per-line': 'off',
   },
 };

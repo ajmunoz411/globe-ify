@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
 import Track from './Track';
 
-const Songs = ({ dbData }) => {
-  let data = [];
-  if (dbData) {
-    data = dbData;
-  }
-
+const Songs = ({ dbData } = []) => {
   const [playingTrack, setPlayingTrack] = useState(null);
 
   return (
     <div className="songs-container">
-      {data.map((song, i) => (
+      {dbData.map((song) => (
         <Track
           song={song}
           setPlayingTrack={setPlayingTrack}
           playTrackId={playingTrack}
-          key={i}
+          key={song.id}
         />
       ))}
     </div>

@@ -2,21 +2,23 @@ import React, { useState } from 'react';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 
-const QuantityDropdown = (props) => {
+const QuantityDropdown = ({ setDataQuantity }) => {
   const [dropQuantity, setDropQuantity] = useState(5);
-  const { setDataQuantity } = props;
 
   const setQuantity = (num) => {
     setDropQuantity(num);
     setDataQuantity(num);
   };
 
+  const dropDownItem = (quantity) => (
+    <Dropdown.Item key={quantity} onClick={() => setQuantity(quantity)}>{quantity}</Dropdown.Item>
+  );
+
+  const quants = [5, 10, 25, 50];
+
   return (
     <DropdownButton className="dropdown-quantity-button" title={dropQuantity} variant="outline-dark" size="sm">
-      <Dropdown.Item onClick={() => setQuantity(5)}>5</Dropdown.Item>
-      <Dropdown.Item onClick={() => setQuantity(10)}>10</Dropdown.Item>
-      <Dropdown.Item onClick={() => setQuantity(25)}>25</Dropdown.Item>
-      <Dropdown.Item onClick={() => setQuantity(50)}>50</Dropdown.Item>
+      {quants.map((num) => dropDownItem(num)) }
     </DropdownButton>
   );
 };
