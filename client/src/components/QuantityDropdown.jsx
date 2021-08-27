@@ -11,12 +11,15 @@ const QuantityDropdown = (props) => {
     setDataQuantity(num);
   };
 
+  const dropDownItem = (quantity) => (
+    <Dropdown.Item onClick={() => setQuantity(quantity)}>{quantity}</Dropdown.Item>
+  );
+
+  const quants = [5, 10, 25, 50];
+
   return (
     <DropdownButton className="dropdown-quantity-button" title={dropQuantity} variant="outline-dark" size="sm">
-      <Dropdown.Item onClick={() => setQuantity(5)}>5</Dropdown.Item>
-      <Dropdown.Item onClick={() => setQuantity(10)}>10</Dropdown.Item>
-      <Dropdown.Item onClick={() => setQuantity(25)}>25</Dropdown.Item>
-      <Dropdown.Item onClick={() => setQuantity(50)}>50</Dropdown.Item>
+      {quants.map((num) => dropDownItem(num)) }
     </DropdownButton>
   );
 };
