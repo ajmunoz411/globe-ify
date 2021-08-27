@@ -1,7 +1,6 @@
 import React from 'react';
 
-const Track = (props) => {
-  const { song, setPlayingTrack, playTrackId } = props;
+const Track = ({ song, setPlayingTrack, playTrackId }) => {
   const {
     rank,
     track,
@@ -23,15 +22,9 @@ const Track = (props) => {
   return (
     <div className="track-info">
       <div>
-        {rank}
-        .
-        <b>{track}</b>
-        -
-        <em>{artist}</em>
-        <br />
-        {streams}
-        Streams ||
-        <i className="far fa-play-circle" onClick={() => setPlayingTrack(id)} onKeyDown={() => setPlayingTrack(id)} role="button" tabIndex="0" label="play" />
+        <div>{rank}. <b>{track}</b> - <em>{artist}</em></div>
+        <div>{streams.toLocaleString()} Streams</div>
+        <div>Listen: <i className="far fa-play-circle" onClick={() => setPlayingTrack(id)} onKeyDown={() => setPlayingTrack(id)} role="button" tabIndex="0" label="play" /></div>
       </div>
       {player}
     </div>

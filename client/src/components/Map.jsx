@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useState } from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import countries from '../../../data/countryCodeCoord';
@@ -47,12 +46,12 @@ const Map = (props) => {
       zoom={1}
       className="main-map"
     >
-      {countries.map((curCountry, i) => (
+      {countries.map((curCountry) => (
         <Marker
           position={{ lat: curCountry.pos[0], lng: curCountry.pos[1] }}
           label={curCountry.name}
           onClick={() => onMapClick(curCountry)}
-          key={i}
+          key={curCountry.code}
         />
       ))}
       <></>

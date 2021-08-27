@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
 
-const QuantityDropdown = (props) => {
+const QuantityDropdown = ({ setDataQuantity }) => {
   const [dropQuantity, setDropQuantity] = useState(5);
-  const { setDataQuantity } = props;
 
   const setQuantity = (num) => {
     setDropQuantity(num);

@@ -14,6 +14,7 @@ const Graph = (props) => {
 
   const [featData, setFeatData] = useState([]);
   const getAverages = (featsArr) => {
+    // console.log('featsArr', featsArr);
     const featuresTotals = {
       acousticness: 0,
       danceability: 0,
