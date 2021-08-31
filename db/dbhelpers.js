@@ -12,6 +12,23 @@ const dbhelpers = {
       }
     });
   },
+
+  // insertTrack: async (trackObj) => {
+  //   const {
+  //     track, artist, newUrl, trackId,
+  //   } = trackObj;
+
+  //   const queryStr = `
+  //     INSERT INTO globeify.tracks (name, artist, url, spotify_id)
+  //     VALUES ($$${track}$$, $$${artist}$$, '${newUrl}', '${trackId}')
+  //     ON CONFLICT DO NOTHING;
+  //   `;
+  //   await db.query(queryStr, (err) => {
+  //     if (err) {
+  //       console.log(`err inserting ${track} into db`, err.stack);
+  //     }
+  //   });
+  // },
 };
 
 module.exports = dbhelpers;
