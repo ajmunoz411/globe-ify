@@ -33,7 +33,7 @@ const insertTrack = async (trackObj) => {
 
   const queryStr = `
     INSERT INTO globeify.tracks (name, artist, url, spotify_id, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration, meter)
-    VALUES ($$${track}$$, $$${artist}$$, '${newUrl}', '${trackId}', ${danceability}, ${energy}, ${key}, ${loudness}, ${mode}, ${speechiness}, ${acousticness}, ${instrumentalness}, ${liveness}, ${valence}, ${tempo}, ${duration_ms}, ${time_signature})
+    VALUES ($trk$${track}$trk$, $art$${artist}$art$, '${newUrl}', '${trackId}', ${danceability}, ${energy}, ${key}, ${loudness}, ${mode}, ${speechiness}, ${acousticness}, ${instrumentalness}, ${liveness}, ${valence}, ${tempo}, ${duration_ms}, ${time_signature})
     ON CONFLICT DO NOTHING
   `;
   // console.log('queryStr', queryStr);
@@ -108,30 +108,28 @@ const insertRanking = async (trackObj, countryCode) => {
 //   const { first, second } = data.rows[0].data;
 // };
 
-// const getAudioFeaturesForTrack = async (spotifyId) => {
-//   const options = {
-//     method: 'get',
-//     url: `https://api.spotify.com/v1/audio-features/${spotifyId}`,
-//     headers: {
-//       Authorization: `Bearer ${config.TOKEN}`,
-//     },
-//   };
+const getAudioFeaturesForTrack = async (spotifyId) => {
+  const options = {
+    method: 'get',
+    url: `https://api.spotify.com/v1/audio-features/${spotifyId}`,
+    headers: {
+      Authorization: `Bearer ${config.TOKEN}`,
+    },
+  };
 
-//   const data = await axios(options)
-//     .then((response) => {
-//       return response.data;
-//     })
-//     .catch((err) => {
-//       console.log('err getting audio features', err.stack);
-//     });
-//   return data;
-// };
+  const data = await axios(options)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((err) => {
+      console.log('err getting audio features', err);
+    });
+  return data;
+};
 
 const getAudioFeaturesForList = async (trackObj) => {
-  // const { list } = req.params;
-  // console.log('trackObjArr', trackObj);
   const list = Object.keys(trackObj).join(',');
-  // console.log('list', list);
+
   const options = {
     method: 'get',
     url: `https://api.spotify.com/v1/audio-features?ids=${list}`,
@@ -142,25 +140,49 @@ const getAudioFeaturesForList = async (trackObj) => {
 
   await axios(options)
     .then((response) => {
-      // console.log('response', response.data);
       response.data.audio_features.forEach((allFeatures) => {
+        if (!allFeatures) {
+          return;
+        }
         const {
           danceability, energy, key, loudness, mode, speechiness, acousticness,
           instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
         } = allFeatures;
-        // console.log('allfeatures', allFeatures);
+
         const selectFeatures = {
           danceability, energy, key, loudness, mode, speechiness, acousticness,
           instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
         };
+
         Object.assign(trackObj[allFeatures.id], selectFeatures);
-        // console.log('trackObj', trackObj);
-        // return trackObj;
       });
     })
     .catch((err) => {
-      console.log('err', err.stack);
+      console.log('err', err);
     });
+
+  const featuresDefaults = {
+    danceability: null,
+    energy: null,
+    key: null,
+    loudness: null,
+    mode: null,
+    speechiness: null,
+    acousticness: null,
+    instrumentalness: null,
+    liveness: null,
+    valence: null,
+    tempo: null,
+    duration_ms: null,
+    time_signature: null,
+  };
+
+  Object.entries(trackObj).forEach(([spotifyId, track]) => {
+    if (track.danceability === undefined) {
+      Object.assign(trackObj[spotifyId], featuresDefaults);
+    }
+  });
+
   return trackObj;
 };
 
@@ -270,9 +292,11 @@ const dataEntryCsv = async (countryCode) => {
     // console.log(`${countryCode} data complete`);
     getAudioFeaturesForList(ids1)
       .then((trackObj) => {
+
         // console.log('trackObj', trackObj);
         Object.entries(trackObj).forEach(([key, value]) => {
           // console.log('key', key, 'value', value);
+          // console.log('value', value);
           insertTrack(value)
             .then(() => {
               insertRanking(value, countryCode);
@@ -286,6 +310,7 @@ const dataEntryCsv = async (countryCode) => {
         // console.log('trackObj', trackObj);
         Object.entries(trackObj).forEach(([key, value]) => {
           // console.log('key', key, 'value', value);
+          // console.log('value2', value);
           insertTrack(value)
             .then(() => {
               insertRanking(value, countryCode);
@@ -300,10 +325,35 @@ const dataEntryCsv = async (countryCode) => {
 
 // dataEntryCsv('sg');
 
-// const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'global', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'lt', 'lu', 'lv', 'ma', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 'vn', 'za'];
+const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'global', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'lt', 'lu', 'lv', 'ma', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 'vn', 'za'];
 
-const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg'];
+// const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es'];
 
-codes.map((code) => (
-  dataEntryCsv(code)
-));
+// const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg'];
+
+// codes.map((code) => (
+//   dataEntryCsv(code)
+// ));
+
+const seedBatch = (batch) => {
+  batch.forEach((countryCode) => {
+    dataEntryCsv(countryCode);
+  });
+};
+
+const interval = () => {
+  setInterval(() => {
+    if (codes.length > 0) {
+      seedBatch(codes.splice(0, 5));
+    } else {
+      console.log('seed complete');
+    }
+  }, 1000);
+};
+
+// dataEntryCsv('fi');
+
+// seed();
+interval();
+
+// getAudioFeaturesForTrack('59o6ojGNGJOYiVJSzC6Lsa');
