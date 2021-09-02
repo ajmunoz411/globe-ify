@@ -7,8 +7,8 @@ const axios = require('axios');
 const config = require('../config');
 
 const { insertTrack, insertRanking } = require('./models/models');
-// const db = require('./index');
-// const spotHelpers = require('../server/spothelpers');
+const { codes } = require('../data/countryCodeCoord');
+const feats = require('../data/audioFeats');
 
 const formatLine = (line) => {
   const [
@@ -43,21 +43,13 @@ const getAudioFeaturesForList = async (trackObj) => {
         if (!allFeatures) {
           return;
         }
-        const {
-          danceability, energy, key, loudness, mode, speechiness, acousticness,
-          instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-        } = allFeatures;
-
-        const selectFeatures = {
-          danceability, energy, key, loudness, mode, speechiness, acousticness,
-          instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-        };
-
+        const features = Object.keys(feats);
+        const selectFeatures = Object.fromEntries((features).map((key) => [key, allFeatures[key]]));
         Object.assign(trackObj[allFeatures.id], selectFeatures);
       });
     })
     .catch((err) => {
-      console.log('err', err);
+      console.log(err);
     });
 
   const featuresDefaults = {
@@ -130,8 +122,6 @@ const dataEntryCsv = (countryCode) => {
     insertTracksAndRankings(allTracksList, countryCode);
   });
 };
-
-const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'global', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'lt', 'lu', 'lv', 'ma', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 'vn', 'za'];
 
 const seedBatch = (batch) => {
   batch.forEach((countryCode) => {

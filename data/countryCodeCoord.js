@@ -20,6 +20,7 @@ const countries = [
   { name: 'Finland', code: 'fi', pos: [64, 27] },
   { name: 'France', code: 'fr', pos: [47, 3] },
   { name: 'Germany', code: 'de', pos: [51, 10] },
+  { name: 'Global', code: 'global', pos: [0, 0] },
   { name: 'Greece', code: 'gr', pos: [39, 22] },
   { name: 'Guatemala', code: 'gt', pos: [15.5, -90] },
   { name: 'Honduras', code: 'hn', pos: [14.7, 87] },
@@ -69,4 +70,9 @@ const countries = [
   { name: 'Vietnam', code: 'vn', pos: [13.6, 108.7] },
 ];
 
-module.exports = countries;
+const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'global', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'lt', 'lu', 'lv', 'ma', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 'vn', 'za'];
+
+module.exports = {
+  countries,
+  codes,
+};
