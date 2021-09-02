@@ -6,8 +6,9 @@ const LineInputStream = require('line-input-stream');
 const axios = require('axios');
 const config = require('../config');
 
-const db = require('./index');
-const spotHelpers = require('../server/spothelpers');
+const { insertTrack, insertRanking } = require('./models/models');
+// const db = require('./index');
+// const spotHelpers = require('../server/spothelpers');
 
 const formatLine = (line) => {
   const [
@@ -23,44 +24,6 @@ const formatLine = (line) => {
   return {
     track, artist, newUrl, trackId, rank, streams,
   };
-};
-
-const insertTrack = async (trackObj) => {
-  const {
-    track, artist, newUrl, trackId, danceability, energy, key, loudness, mode, speechiness,
-    acousticness, instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-  } = trackObj;
-
-  const queryStr = `
-    INSERT INTO globeify.tracks (name, artist, url, spotify_id, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration, meter)
-    VALUES ($trk$${track}$trk$, $art$${artist}$art$, '${newUrl}', '${trackId}', ${danceability}, ${energy}, ${key}, ${loudness}, ${mode}, ${speechiness}, ${acousticness}, ${instrumentalness}, ${liveness}, ${valence}, ${tempo}, ${duration_ms}, ${time_signature})
-    ON CONFLICT DO NOTHING
-  `;
-
-  const data = await db.query(queryStr);
-  return data;
-};
-
-const insertRanking = async (trackObj, countryCode) => {
-  const {
-    trackId, rank, streams,
-  } = trackObj;
-
-  const queryStr = `
-    INSERT INTO globeify.rankings (rank, streams, country_id, track_id)
-    VALUES (
-      ${rank},
-      ${streams},
-      ( SELECT id FROM globeify.countries WHERE code='${countryCode}' ),
-      ( SELECT id FROM globeify.tracks WHERE spotify_id='${trackId}' )
-    )
-  `;
-
-  await db.query(queryStr, (err) => {
-    if (err) {
-      console.log(`err inserting ranking ${rank} for ${countryCode}`, err.stack);
-    }
-  });
 };
 
 const getAudioFeaturesForList = async (trackObj) => {
@@ -132,26 +95,26 @@ const insertTracksAndRankings = (tracksObj, countryCode) => {
   });
 };
 
-const dataEntryCsv = async (countryCode) => {
+const dataEntryCsv = (countryCode) => {
   const readPath = path.join(__dirname, `../dataOrig/regional-${countryCode}-weekly-latest.csv`);
   const readStream = LineInputStream(fs.createReadStream(readPath, { flags: 'r' }));
 
   readStream.setDelimiter('\n');
 
   let lineCount = -1;
-  const ids1 = {};
-  const ids2 = {};
+  const first100Tracks = {};
+  const second100Tracks = {};
 
   readStream.on('line', async (line) => {
     lineCount++;
     if (lineCount !== 0) {
       const formatted = formatLine(line);
-      const id = formatted.trackId;
+      const spotifyId = formatted.trackId;
 
       if (lineCount <= 100) {
-        ids1[id] = formatted;
+        first100Tracks[spotifyId] = formatted;
       } else {
-        ids2[id] = formatted;
+        second100Tracks[spotifyId] = formatted;
       }
     }
   });
@@ -161,10 +124,10 @@ const dataEntryCsv = async (countryCode) => {
   });
 
   readStream.on('end', async () => {
-    const tracksListObj100 = await getAudioFeaturesForList(ids1);
-    const tracksListObj200 = await getAudioFeaturesForList(ids2);
-    insertTracksAndRankings(tracksListObj100, countryCode);
-    insertTracksAndRankings(tracksListObj200, countryCode);
+    const tracksListObj100 = await getAudioFeaturesForList(first100Tracks);
+    const tracksListObj200 = await getAudioFeaturesForList(second100Tracks);
+    const allTracksList = Object.assign(tracksListObj100, tracksListObj200);
+    insertTracksAndRankings(allTracksList, countryCode);
   });
 };
 
