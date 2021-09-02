@@ -40,16 +40,14 @@ const getAudioFeaturesForList = async (trackObj) => {
   await axios(options)
     .then((response) => {
       response.data.audio_features.forEach((allFeatures) => {
-        if (!allFeatures) {
-          return;
-        }
+        if (!allFeatures) { return; }
         const features = Object.keys(feats);
         const selectFeatures = Object.fromEntries((features).map((key) => [key, allFeatures[key]]));
         Object.assign(trackObj[allFeatures.id], selectFeatures);
       });
     })
     .catch((err) => {
-      console.log(err);
+      console.log(err.stack);
     });
 
   const featuresDefaults = {
@@ -81,16 +79,13 @@ const insertTracksAndRankings = (tracksObj, countryCode) => {
   Object.entries(tracksObj).forEach((track) => {
     const trackObj = track[1];
     insertTrack(trackObj)
-      .then(() => {
-        insertRanking(trackObj, countryCode);
-      });
+      .then(() => { insertRanking(trackObj, countryCode); });
   });
 };
 
-const dataEntryCsv = (countryCode) => {
+const seedCountryCSV = (countryCode) => {
   const readPath = path.join(__dirname, `../dataOrig/regional-${countryCode}-weekly-latest.csv`);
   const readStream = LineInputStream(fs.createReadStream(readPath, { flags: 'r' }));
-
   readStream.setDelimiter('\n');
 
   let lineCount = -1;
@@ -125,7 +120,7 @@ const dataEntryCsv = (countryCode) => {
 
 const seedBatch = (batch) => {
   batch.forEach((countryCode) => {
-    dataEntryCsv(countryCode);
+    seedCountryCSV(countryCode);
   });
 };
 
@@ -135,49 +130,12 @@ const interval = () => {
       seedBatch(codes.splice(0, 5));
     } else {
       console.log('seed complete');
+      clearInterval(interval);
     }
   }, 1000);
 };
 
 interval();
-
-// getAudioFeaturesForList(ids1)
-//   .then((trackObj) => {
-//     Object.entries(trackObj).forEach(([key, value]) => {
-//       insertTrack(value)
-//         .then(() => {
-//           insertRanking(value, countryCode);
-//         });
-//     });
-//   });
-// getAudioFeaturesForList(ids2)
-//   .then((trackObj) => {
-//     Object.entries(trackObj).forEach(([key, value]) => {
-//       insertTrack(value)
-//         .then(() => {
-//           insertRanking(value, countryCode);
-//         });
-//     });
-//   });
-
-// const getAudioFeaturesForTrack = async (spotifyId) => {
-//   const options = {
-//     method: 'get',
-//     url: `https://api.spotify.com/v1/audio-features/${spotifyId}`,
-//     headers: {
-//       Authorization: `Bearer ${config.TOKEN}`,
-//     },
-//   };
-
-//   const data = await axios(options)
-//     .then((response) => {
-//       return response.data;
-//     })
-//     .catch((err) => {
-//       console.log('err getting audio features', err);
-//     });
-//   return data;
-// };
 
 // const getTrackIds = async (countryCode) => {
 //   const queryStr = `
@@ -208,46 +166,3 @@ interval();
 //   const data = await db.query(queryStr);
 //   const { first, second } = data.rows[0].data;
 // };
-
-// await getAudioFeaturesForTrack(id)
-//   .then((allFeatures) => {
-//     const {
-//       danceability, energy, key, loudness, mode, speechiness, acousticness,
-//       instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-//     } = allFeatures;
-//     const selectFeatures = {
-//       danceability, energy, key, loudness, mode, speechiness, acousticness,
-//       instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-//     };
-//     return selectFeatures;
-//   })
-//   .then((selectFeatures) => {
-//     const extended = Object.assign(formatted, selectFeatures);
-//     return extended;
-//   })
-//   .then(async (extended) => {
-//     await insertTrack(extended);
-//     // return {
-//     //   track: extended.track,
-//     //   trackId: extended.trackId,
-//     //   rank: extended.rank,
-//     //   streams: extended.streams,
-//     // };
-//   })
-//   .then(async () => {
-//     await insertRanking(formatted.trackId, formatted.rank, formatted.streams, countryCode);
-//   })
-//   // .then((trackObj) => {
-//   //   insertRanking(trackObj, countryCode);
-//   // })
-//   .catch((err) => {
-//     console.log(`err at ${line}`, err.stack);
-//   });
-
-// insertTrack(formatted)
-//   .then(() => {
-//     insertRanking(formatted, 'tw');
-//   })
-//   .catch((err) => {
-//     console.log(`err at ${line}`, err.stack);
-//   });
