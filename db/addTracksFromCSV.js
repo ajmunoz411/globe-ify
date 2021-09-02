@@ -3,11 +3,12 @@
 const fs = require('fs');
 const path = require('path');
 const LineInputStream = require('line-input-stream');
+const axios = require('axios');
 const config = require('../config');
 
-const axios = require('axios');
-const db = require('./index');
-const spotHelpers = require('../server/spothelpers');
+const { insertTrack, insertRanking } = require('./models/models');
+// const db = require('./index');
+// const spotHelpers = require('../server/spothelpers');
 
 const formatLine = (line) => {
   const [
@@ -25,58 +26,168 @@ const formatLine = (line) => {
   };
 };
 
-const insertTrack = async (trackObj) => {
-  // console.log('trackObj', trackObj);
-  const {
-    track, artist, newUrl, trackId, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-  } = trackObj;
+const getAudioFeaturesForList = async (trackObj) => {
+  const list = Object.keys(trackObj).join(',');
 
-  const queryStr = `
-    INSERT INTO globeify.tracks (name, artist, url, spotify_id, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration, meter)
-    VALUES ($$${track}$$, $$${artist}$$, '${newUrl}', '${trackId}', ${danceability}, ${energy}, ${key}, ${loudness}, ${mode}, ${speechiness}, ${acousticness}, ${instrumentalness}, ${liveness}, ${valence}, ${tempo}, ${duration_ms}, ${time_signature})
-    ON CONFLICT DO NOTHING
-  `;
-  // console.log('queryStr', queryStr);
-  // const data = await db.query(queryStr, (err, data2) => {
-  //   if (err) {
-  //     console.log(`err inserting ${track} into db`, err.stack);
-  //   } else {
-  //     return data2.rows[0].id;
-  //     // console.log('data2', data2);
-  //   }
-  // });
-  const data = await db.query(queryStr);
-    // .then((data2) => {
-    //   console.log(data2.rows);
-    // })
-  // return trackObj;
-  // console.log('data in insert track', data);
-  // console.log('insert track');
-  return data;
-};
+  const options = {
+    method: 'get',
+    url: `https://api.spotify.com/v1/audio-features?ids=${list}`,
+    headers: {
+      Authorization: `Bearer ${config.TOKEN}`,
+    },
+  };
 
-const insertRanking = async (trackObj, countryCode) => {
-  const {
-    track, artist, newUrl, trackId, rank, streams,
-  } = trackObj;
-  // console.log('insert Ranking!!');
+  await axios(options)
+    .then((response) => {
+      response.data.audio_features.forEach((allFeatures) => {
+        if (!allFeatures) {
+          return;
+        }
+        const {
+          danceability, energy, key, loudness, mode, speechiness, acousticness,
+          instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
+        } = allFeatures;
 
-  const queryStr = `
-    INSERT INTO globeify.rankings (rank, streams, country_id, track_id)
-    VALUES (
-      ${rank},
-      ${streams},
-      ( SELECT id FROM globeify.countries WHERE code='${countryCode}' ),
-      ( SELECT id FROM globeify.tracks WHERE spotify_id='${trackId}' )
-    )
-  `;
+        const selectFeatures = {
+          danceability, energy, key, loudness, mode, speechiness, acousticness,
+          instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
+        };
 
-  await db.query(queryStr, (err) => {
-    if (err) {
-      console.log(`err inserting ranking ${rank} for ${countryCode}`, err.stack);
+        Object.assign(trackObj[allFeatures.id], selectFeatures);
+      });
+    })
+    .catch((err) => {
+      console.log('err', err);
+    });
+
+  const featuresDefaults = {
+    danceability: null,
+    energy: null,
+    key: null,
+    loudness: null,
+    mode: null,
+    speechiness: null,
+    acousticness: null,
+    instrumentalness: null,
+    liveness: null,
+    valence: null,
+    tempo: null,
+    duration_ms: null,
+    time_signature: null,
+  };
+
+  Object.entries(trackObj).forEach(([spotifyId, track]) => {
+    if (track.danceability === undefined) {
+      Object.assign(trackObj[spotifyId], featuresDefaults);
     }
   });
+
+  return trackObj;
 };
+
+const insertTracksAndRankings = (tracksObj, countryCode) => {
+  Object.entries(tracksObj).forEach((track) => {
+    const trackObj = track[1];
+    insertTrack(trackObj)
+      .then(() => {
+        insertRanking(trackObj, countryCode);
+      });
+  });
+};
+
+const dataEntryCsv = (countryCode) => {
+  const readPath = path.join(__dirname, `../dataOrig/regional-${countryCode}-weekly-latest.csv`);
+  const readStream = LineInputStream(fs.createReadStream(readPath, { flags: 'r' }));
+
+  readStream.setDelimiter('\n');
+
+  let lineCount = -1;
+  const first100Tracks = {};
+  const second100Tracks = {};
+
+  readStream.on('line', async (line) => {
+    lineCount++;
+    if (lineCount !== 0) {
+      const formatted = formatLine(line);
+      const spotifyId = formatted.trackId;
+
+      if (lineCount <= 100) {
+        first100Tracks[spotifyId] = formatted;
+      } else {
+        second100Tracks[spotifyId] = formatted;
+      }
+    }
+  });
+
+  readStream.on('error', (err) => {
+    console.log('error reading CSV', err.stack);
+  });
+
+  readStream.on('end', async () => {
+    const tracksListObj100 = await getAudioFeaturesForList(first100Tracks);
+    const tracksListObj200 = await getAudioFeaturesForList(second100Tracks);
+    const allTracksList = Object.assign(tracksListObj100, tracksListObj200);
+    insertTracksAndRankings(allTracksList, countryCode);
+  });
+};
+
+const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'global', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'lt', 'lu', 'lv', 'ma', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 'vn', 'za'];
+
+const seedBatch = (batch) => {
+  batch.forEach((countryCode) => {
+    dataEntryCsv(countryCode);
+  });
+};
+
+const interval = () => {
+  setInterval(() => {
+    if (codes.length > 0) {
+      seedBatch(codes.splice(0, 5));
+    } else {
+      console.log('seed complete');
+    }
+  }, 1000);
+};
+
+interval();
+
+// getAudioFeaturesForList(ids1)
+//   .then((trackObj) => {
+//     Object.entries(trackObj).forEach(([key, value]) => {
+//       insertTrack(value)
+//         .then(() => {
+//           insertRanking(value, countryCode);
+//         });
+//     });
+//   });
+// getAudioFeaturesForList(ids2)
+//   .then((trackObj) => {
+//     Object.entries(trackObj).forEach(([key, value]) => {
+//       insertTrack(value)
+//         .then(() => {
+//           insertRanking(value, countryCode);
+//         });
+//     });
+//   });
+
+// const getAudioFeaturesForTrack = async (spotifyId) => {
+//   const options = {
+//     method: 'get',
+//     url: `https://api.spotify.com/v1/audio-features/${spotifyId}`,
+//     headers: {
+//       Authorization: `Bearer ${config.TOKEN}`,
+//     },
+//   };
+
+//   const data = await axios(options)
+//     .then((response) => {
+//       return response.data;
+//     })
+//     .catch((err) => {
+//       console.log('err getting audio features', err);
+//     });
+//   return data;
+// };
 
 // const getTrackIds = async (countryCode) => {
 //   const queryStr = `
@@ -108,202 +219,45 @@ const insertRanking = async (trackObj, countryCode) => {
 //   const { first, second } = data.rows[0].data;
 // };
 
-// const getAudioFeaturesForTrack = async (spotifyId) => {
-//   const options = {
-//     method: 'get',
-//     url: `https://api.spotify.com/v1/audio-features/${spotifyId}`,
-//     headers: {
-//       Authorization: `Bearer ${config.TOKEN}`,
-//     },
-//   };
+// await getAudioFeaturesForTrack(id)
+//   .then((allFeatures) => {
+//     const {
+//       danceability, energy, key, loudness, mode, speechiness, acousticness,
+//       instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
+//     } = allFeatures;
+//     const selectFeatures = {
+//       danceability, energy, key, loudness, mode, speechiness, acousticness,
+//       instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
+//     };
+//     return selectFeatures;
+//   })
+//   .then((selectFeatures) => {
+//     const extended = Object.assign(formatted, selectFeatures);
+//     return extended;
+//   })
+//   .then(async (extended) => {
+//     await insertTrack(extended);
+//     // return {
+//     //   track: extended.track,
+//     //   trackId: extended.trackId,
+//     //   rank: extended.rank,
+//     //   streams: extended.streams,
+//     // };
+//   })
+//   .then(async () => {
+//     await insertRanking(formatted.trackId, formatted.rank, formatted.streams, countryCode);
+//   })
+//   // .then((trackObj) => {
+//   //   insertRanking(trackObj, countryCode);
+//   // })
+//   .catch((err) => {
+//     console.log(`err at ${line}`, err.stack);
+//   });
 
-//   const data = await axios(options)
-//     .then((response) => {
-//       return response.data;
-//     })
-//     .catch((err) => {
-//       console.log('err getting audio features', err.stack);
-//     });
-//   return data;
-// };
-
-const getAudioFeaturesForList = async (trackObj) => {
-  // const { list } = req.params;
-  // console.log('trackObjArr', trackObj);
-  const list = Object.keys(trackObj).join(',');
-  // console.log('list', list);
-  const options = {
-    method: 'get',
-    url: `https://api.spotify.com/v1/audio-features?ids=${list}`,
-    headers: {
-      Authorization: `Bearer ${config.TOKEN}`,
-    },
-  };
-
-  await axios(options)
-    .then((response) => {
-      // console.log('response', response.data);
-      response.data.audio_features.forEach((allFeatures) => {
-        const {
-          danceability, energy, key, loudness, mode, speechiness, acousticness,
-          instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-        } = allFeatures;
-        // console.log('allfeatures', allFeatures);
-        const selectFeatures = {
-          danceability, energy, key, loudness, mode, speechiness, acousticness,
-          instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-        };
-        Object.assign(trackObj[allFeatures.id], selectFeatures);
-        // console.log('trackObj', trackObj);
-        // return trackObj;
-      });
-    })
-    .catch((err) => {
-      console.log('err', err.stack);
-    });
-  return trackObj;
-};
-
-// getTrackIds('tw');
-
-const dataEntryCsv = async (countryCode) => {
-  const readPath = path.join(__dirname, `../dataOrig/regional-${countryCode}-weekly-latest.csv`);
-  const readStream = LineInputStream(fs.createReadStream(readPath, { flags: 'r' }));
-
-  readStream.setDelimiter('\n');
-
-  let lineCount = -1;
-  const ids1 = {};
-  const ids2 = {};
-
-  readStream.on('line', async (line) => {
-    lineCount++;
-    if (lineCount !== 0) {
-    // if (line.slice(0, 1) !== 'P') {
-    //   Promise.resolve(formatLine(line))
-    //     .then((formatted) => {
-    //       insertTrack(formatted);
-    //     })
-    //     // .then((formatted) => {
-    //     //   console.log('formatted', formatted);
-    //     // })
-    //     .catch((err) => {
-    //       console.log(`err at ${line}`, err.stack);
-    //     });
-    // }
-      const formatted = formatLine(line);
-      const id = formatted.trackId;
-      // console.log('id', id);
-      // console.log({ [id]: formatted });
-      // console.log('line', line);
-      // console.log('formatted', formatted);
-      // console.log('id', id);
-      if (lineCount <= 100) {
-        // ids1.push({ [id]: formatted });
-        ids1[id] = formatted;
-      } else {
-        // ids2.push({ [id]: formatted });
-        ids2[id] = formatted;
-      }
-      // await getAudioFeaturesForTrack(id)
-      //   .then((allFeatures) => {
-      //     const {
-      //       danceability, energy, key, loudness, mode, speechiness, acousticness,
-      //       instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-      //     } = allFeatures;
-      //     // console.log('allfeatures', allFeatures);
-      //     const selectFeatures = {
-      //       danceability, energy, key, loudness, mode, speechiness, acousticness,
-      //       instrumentalness, liveness, valence, tempo, duration_ms, time_signature,
-      //     };
-      //     // console.log('getFeatures');
-      //     // console.log('selectFeatures1', selectFeatures);
-      //     return selectFeatures;
-      //   })
-      //   .then((selectFeatures) => {
-      //     // console.log('selectFeatures2', selectFeatures);
-      //     const extended = Object.assign(formatted, selectFeatures);
-      //     // console.log('extended', extended);
-      //     return extended;
-      //   })
-      //   .then(async (extended) => {
-      //     // console.log('extended2', extended);
-      //     // console.log('insertTrack');
-      //     await insertTrack(extended);
-      //     // return {
-      //     //   track: extended.track,
-      //     //   trackId: extended.trackId,
-      //     //   rank: extended.rank,
-      //     //   streams: extended.streams,
-      //     // };
-      //   })
-      //   .then(async () => {
-      //     // console.log('data', data);
-      //     // console.log('insertRanking)');
-      //     // console.log('formatted2', formatted);
-      //     // console.log('countrycode', countryCode);
-      //     await insertRanking(formatted.trackId, formatted.rank, formatted.streams, countryCode);
-      //   })
-      //   // .then((trackObj) => {
-      //   //   insertRanking(trackObj, countryCode);
-      //   // })
-      //   .catch((err) => {
-      //     console.log(`err at ${line}`, err.stack);
-      //   });
-      // console.log('audioFeat', audioFeat);
-
-      // insertTrack(formatted)
-      //   .then(() => {
-      //     insertRanking(formatted, 'tw');
-      //   })
-      //   .catch((err) => {
-      //     console.log(`err at ${line}`, err.stack);
-      //   });
-    }
-  });
-
-  readStream.on('error', (err) => {
-    console.log('error reading CSV', err.stack);
-  });
-
-  readStream.on('end', () => {
-    // console.log(`${countryCode} data complete`);
-    getAudioFeaturesForList(ids1)
-      .then((trackObj) => {
-        // console.log('trackObj', trackObj);
-        Object.entries(trackObj).forEach(([key, value]) => {
-          // console.log('key', key, 'value', value);
-          insertTrack(value)
-            .then(() => {
-              insertRanking(value, countryCode);
-            });
-        });
-        // return trackObj;
-      });
-      // .then((trackObj) => {
-    getAudioFeaturesForList(ids2)
-      .then((trackObj) => {
-        // console.log('trackObj', trackObj);
-        Object.entries(trackObj).forEach(([key, value]) => {
-          // console.log('key', key, 'value', value);
-          insertTrack(value)
-            .then(() => {
-              insertRanking(value, countryCode);
-            });
-        });
-        // return trackObj;
-      });
-      // })
-    // getAudioFeaturesForList(ids2);
-  });
-};
-
-// dataEntryCsv('sg');
-
-// const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'eg', 'es', 'fi', 'fr', 'gb', 'global', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'in', 'is', 'it', 'jp', 'kr', 'lt', 'lu', 'lv', 'ma', 'mx', 'my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'ru', 'sa', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'ua', 'us', 'uy', 'vn', 'za'];
-
-const codes = ['ae', 'ar', 'at', 'au', 'be', 'bg'];
-
-codes.map((code) => (
-  dataEntryCsv(code)
-));
+// insertTrack(formatted)
+//   .then(() => {
+//     insertRanking(formatted, 'tw');
+//   })
+//   .catch((err) => {
+//     console.log(`err at ${line}`, err.stack);
+//   });
