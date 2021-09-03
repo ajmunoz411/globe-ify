@@ -6,7 +6,8 @@
   "scripts": {
     "test": "npm test",
     "start": "nodemon server/index.js",
-    "build": "webpack --config ./webpack.config.js --mode development -w"
+    "build": "webpack --config ./webpack.config.js --mode development -w",
+    "seed": "node seeder/index.js"
   },
   "repository": {
     "type": "git",

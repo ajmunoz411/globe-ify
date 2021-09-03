@@ -1,6 +1,20 @@
 /* eslint-disable camelcase */
 const db = require('../index');
 
+const insertCountry = async (country) => {
+  const { name, code, pos } = country;
+  const coord = `point(${pos[1]}, ${pos[0]})`;
+  const queryStr = `
+    INSERT INTO globeify.countries (code, name, coordinate)
+    VALUES ('${code}', '${name}', ${coord})
+  `;
+  await db.query(queryStr, (err) => {
+    if (err) {
+      console.log(`err inserting ${name}`, err.stack);
+    }
+  });
+};
+
 const insertTrack = async (trackObj) => {
   const {
     track, artist, newUrl, trackId, danceability, energy, key, loudness, mode, speechiness,
@@ -30,6 +44,7 @@ const insertRanking = async (trackObj, countryCode) => {
       ( SELECT id FROM globeify.countries WHERE code='${countryCode}' ),
       ( SELECT id FROM globeify.tracks WHERE spotify_id='${trackId}' )
     )
+    ON CONFLICT DO NOTHING
   `;
 
   await db.query(queryStr, (err) => {
@@ -40,6 +55,7 @@ const insertRanking = async (trackObj, countryCode) => {
 };
 
 module.exports = {
+  insertCountry,
   insertTrack,
   insertRanking,
 };
