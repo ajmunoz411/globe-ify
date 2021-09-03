@@ -4,3 +4,5 @@ config.js
 dataOrig
 dataClean
 bundle.js
+csv
+archived

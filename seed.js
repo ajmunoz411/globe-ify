@@ -4,11 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const LineInputStream = require('line-input-stream');
 const axios = require('axios');
-const config = require('../config');
+const config = require('./config');
 
-const { insertTrack, insertRanking } = require('./models/models');
-const { codes } = require('../data/countryCodeCoord');
-const feats = require('../data/audioFeats');
+const { insertTrack, insertRanking } = require('./db/models/models');
+const { codes } = require('./data/countryCodeCoord');
+const feats = require('./data/audioFeats');
 
 const formatLine = (line) => {
   const [
@@ -84,7 +84,7 @@ const insertTracksAndRankings = (tracksObj, countryCode) => {
 };
 
 const seedCountryCSV = (countryCode) => {
-  const readPath = path.join(__dirname, `../dataOrig/regional-${countryCode}-weekly-latest.csv`);
+  const readPath = path.join(__dirname, `./data/csv/regional-${countryCode}-weekly-latest.csv`);
   const readStream = LineInputStream(fs.createReadStream(readPath, { flags: 'r' }));
   readStream.setDelimiter('\n');
 
@@ -124,8 +124,8 @@ const seedBatch = (batch) => {
   });
 };
 
-const interval = () => {
-  setInterval(() => {
+const startIntervalSeed = () => {
+  const interval = setInterval(() => {
     if (codes.length > 0) {
       seedBatch(codes.splice(0, 5));
     } else {
@@ -135,34 +135,4 @@ const interval = () => {
   }, 1000);
 };
 
-interval();
-
-// const getTrackIds = async (countryCode) => {
-//   const queryStr = `
-//     SELECT ROW_TO_JSON(z) AS data
-//     FROM (
-//       SELECT (
-//         SELECT JSON_AGG(x) AS first
-//         FROM (
-//           SELECT rank, spotify_id FROM globeify.rankings
-//           INNER JOIN globeify.tracks ON globeify.rankings.track_id=globeify.tracks.id
-//           WHERE country_id=(SELECT id FROM globeify.countries WHERE code='${countryCode}')
-//           AND rank <= 100
-//           ORDER BY rank
-//         ) x
-//       ), (
-//         SELECT json_agg(y) AS second
-//         FROM (
-//           SELECT rank, spotify_id FROM globeify.rankings
-//           INNER JOIN globeify.tracks ON globeify.rankings.track_id=globeify.tracks.id
-//           WHERE country_id=(SELECT id FROM globeify.countries WHERE code='${countryCode}')
-//           AND rank >= 101
-//           ORDER BY rank
-//         ) y
-//       )
-//     ) z
-//   `;
-
-//   const data = await db.query(queryStr);
-//   const { first, second } = data.rows[0].data;
-// };
+startIntervalSeed();

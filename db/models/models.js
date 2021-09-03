@@ -30,6 +30,7 @@ const insertRanking = async (trackObj, countryCode) => {
       ( SELECT id FROM globeify.countries WHERE code='${countryCode}' ),
       ( SELECT id FROM globeify.tracks WHERE spotify_id='${trackId}' )
     )
+    ON CONFLICT DO NOTHING
   `;
 
   await db.query(queryStr, (err) => {
