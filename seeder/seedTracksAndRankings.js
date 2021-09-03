@@ -4,11 +4,11 @@ const fs = require('fs');
 const path = require('path');
 const LineInputStream = require('line-input-stream');
 const axios = require('axios');
-const config = require('./config');
+const config = require('../config');
 
-const { insertTrack, insertRanking } = require('./db/models/models');
-const { codes } = require('./data/countryCodeCoord');
-const feats = require('./data/audioFeats');
+const { insertTrack, insertRanking } = require('../db/models/models');
+const { codes } = require('../data/countryCodeCoord');
+const feats = require('../data/audioFeats');
 
 const formatLine = (line) => {
   const [
@@ -84,7 +84,7 @@ const insertTracksAndRankings = (tracksObj, countryCode) => {
 };
 
 const seedCountryCSV = (countryCode) => {
-  const readPath = path.join(__dirname, `./data/csv/regional-${countryCode}-weekly-latest.csv`);
+  const readPath = path.join(__dirname, `../data/csv/regional-${countryCode}-weekly-latest.csv`);
   const readStream = LineInputStream(fs.createReadStream(readPath, { flags: 'r' }));
   readStream.setDelimiter('\n');
 
@@ -135,4 +135,6 @@ const startIntervalSeed = () => {
   }, 1000);
 };
 
-startIntervalSeed();
+// startIntervalSeed();
+
+module.exports = startIntervalSeed;

@@ -1,5 +1,5 @@
-const countries = require('../data/countryCodeCoord');
-const db = require('./index');
+const { countries } = require('../data/countryCodeCoord');
+const db = require('../db/index');
 
 const insertCountry = async (country) => {
   const { name, code, pos } = country;
@@ -24,4 +24,4 @@ const addCountries = () => {
   });
 };
 
-addCountries();
+module.exports = addCountries;
