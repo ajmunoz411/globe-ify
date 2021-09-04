@@ -11,7 +11,7 @@ const Songs = ({ dbData } = []) => {
           song={song}
           setPlayingTrack={setPlayingTrack}
           playTrackId={playingTrack}
-          key={song.id}
+          key={song.spotify_id}
         />
       ))}
     </div>
