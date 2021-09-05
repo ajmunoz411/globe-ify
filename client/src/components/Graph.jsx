@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { PolarArea } from 'react-chartjs-2';
-import axios from 'axios';
 import graphProps from '../../../data/graphProps';
 
 const Graph = (props) => {
@@ -14,12 +13,11 @@ const Graph = (props) => {
   } = props;
 
   const [featData, setFeatData] = useState([]);
-  const getAverages = (featsArr, theorySetter) => {
-    console.log('featsArr', featsArr);
+  const getAverages = (tracks, theorySetter) => {
     const featuresTotals = {
       acousticness: 0,
       danceability: 0,
-      duration_ms: 0,
+      duration: 0,
       energy: 0,
       instrumentalness: 0,
       key: 0,
@@ -28,104 +26,62 @@ const Graph = (props) => {
       mode: 0,
       speechiness: 0,
       tempo: 0,
-      time_signature: 0,
+      meter: 0,
       valence: 0,
     };
 
-    featsArr.forEach((featObj) => {
-      Object.entries(featObj).forEach((feature) => {
-        if (featuresTotals[feature[0]] !== undefined) {
-          featuresTotals[feature[0]] += feature[1];
+    tracks.forEach((trackObj) => {
+      Object.entries(trackObj).forEach(([feature, value]) => {
+        if (featuresTotals[feature] !== undefined) {
+          featuresTotals[feature] += value;
         }
       });
     });
 
-    // const featuresTotalsArr = Object.entries(featuresTotals);
-
-    const averageFeats = {};
-
-    Object.entries(featuresTotals).forEach((feature) => {
-      averageFeats[feature[0]] = feature[1] / quantityOne;
-    });
-    // featuresTotalsArr.forEach((feature) => {
-    //   averageFeats[feature[0]] = feature[1] / quantityOne;
-    // });
-    console.log('averageFeats', averageFeats);
-    const graphFeats = [];
+    const graphFeats = {};
     const theoryFeats = {};
 
-    // graphFeats.push(averageFeats.acousticness * 100);
-    // graphFeats.push(averageFeats.danceability * 100);
-    // graphFeats.push(averageFeats.energy * 100);
-    // graphFeats.push(averageFeats.instrumentalness * 100);
-    // graphFeats.push(averageFeats.liveness * 100);
-    // graphFeats.push((10 ** (averageFeats.loudness / 10)) * 100);
-    // graphFeats.push(averageFeats.speechiness * 100);
-    // graphFeats.push(averageFeats.valence * 100);
-    // console.log('graphFeats', graphFeats);
+    Object.entries(featuresTotals).forEach(([feature, value]) => {
+      // convert to minutes / 6 * 100 (so 100% is 6 minutes)
+      if (feature === 'duration') {
+        const bpm = value / quantityOne / 1000 / 60;
+        theoryFeats[feature] = bpm;
+        graphFeats[feature] = (bpm / 6) * 100;
+      // convert db to percentage (p = (10 ^ X/10) * 100)
+      } else if (feature === 'loudness') {
+        theoryFeats[feature] = value / quantityOne;
+        graphFeats[feature] = 10 ** ((value / quantityOne) / 10) * 100;
+        // round to nearest whole
+      } else if (feature === 'key') {
+        theoryFeats[feature] = Math.round(value / quantityOne);
+      } else if (feature === 'meter' || feature === 'mode') {
+        theoryFeats[feature] = value / quantityOne;
+        // convert to percentage using 300 bpm as 100%
+      } else if (feature === 'tempo') {
+        theoryFeats[feature] = value / quantityOne;
+        graphFeats[feature] = (value / quantityOne) / 3;
+      } else if (feature === 'instrumentalness') {
+        graphFeats[feature] = (value / quantityOne) * 10000;
+      } else {
+        graphFeats[feature] = (value / quantityOne) * 100;
+      }
+    });
 
-    graphFeats.push(averageFeats.acousticness * 10);
-    graphFeats.push(averageFeats.danceability * 10);
-    graphFeats.push(averageFeats.duration_ms / 1000 / 60);
-    graphFeats.push(averageFeats.energy * 10);
-    graphFeats.push(averageFeats.instrumentalness * 1000);
-    graphFeats.push(averageFeats.liveness * 10);
-    graphFeats.push(averageFeats.loudness + 10);
-    graphFeats.push(averageFeats.speechiness * 10);
-    graphFeats.push(averageFeats.tempo / 20);
-    graphFeats.push(averageFeats.valence * 10);
-
-    const { keys, modes } = graphProps;
-
-    theoryFeats['Key'] = keys[Math.round(averageFeats.key) - 1];
-    theoryFeats['Mode'] = modes[Math.round(averageFeats.mode)];
-    theoryFeats['Meter'] = averageFeats.time_signature;
-    theoryFeats['BPM'] = Math.round(averageFeats.tempo);
-
-    // setFeatData([...graphFeats]);
-    setFeatData((oldArray) => [...oldArray, ...graphFeats]);
+    // setFeatData([...Object.values(graphFeats)]);
+    setFeatData((oldArray) => [...oldArray, ...Object.values(graphFeats)]);
     const theoryArr = Object.entries(theoryFeats);
-    // setTheoryDataOne([...theoryArr]);
     theorySetter([...theoryArr]);
   };
 
   useEffect(() => {
-    let idsList = '';
     if (dbDataOne.length > 0) {
-      dbDataOne.map((track, i) => {
-        if (i !== dbDataOne.length - 1) {
-          idsList += `${track.id},`;
-        } else {
-          idsList += track.id;
-        }
-      });
-      axios.get(`/spotify/features/${idsList}`)
-        .then((resFeatData) => {
-          getAverages(resFeatData.data.audio_features, setTheoryDataOne);
-        })
-        .catch((err) => {
-          console.log('err getting features', err);
-        });
+      getAverages(dbDataOne, setTheoryDataOne);
     }
   }, [dbDataOne, quantityOne]);
 
   useEffect(() => {
-    let idsList = '';
     if (dbDataTwo.length > 0) {
-      dbDataTwo.map((track, i) => {
-        if (i !== dbDataTwo.length - 1) {
-          idsList += `${track.id},`;
-        } else {
-          idsList += track.id;
-        }
-      });
-      axios.get(`/spotify/features/${idsList}`)
-        .then((resFeatData) => {
-          getAverages(resFeatData.data.audio_features, setTheoryDataTwo);
-        })
-        .catch((err) => {
-          console.log('err getting features', err);
-        });
+      getAverages(dbDataTwo, setTheoryDataTwo);
     }
   }, [dbDataTwo, quantityTwo]);
 
@@ -228,3 +184,43 @@ export default Graph;
 //   const theoryArr = Object.entries(theoryFeats);
 //   setTheoryDataTwo([...theoryArr]);
 // };
+
+// useEffect(() => {
+//   let idsList = '';
+//   if (dbDataTwo.length > 0) {
+//     dbDataTwo.map((track, i) => {
+//       if (i !== dbDataTwo.length - 1) {
+//         idsList += `${track.id},`;
+//       } else {
+//         idsList += track.id;
+//       }
+//     });
+//     axios.get(`/spotify/features/${idsList}`)
+//       .then((resFeatData) => {
+//         getAverages(resFeatData.data.audio_features, setTheoryDataTwo);
+//       })
+//       .catch((err) => {
+//         console.log('err getting features', err);
+//       });
+//   }
+// }, [dbDataTwo, quantityTwo]);
+
+// useEffect(() => {
+//   let idsList = '';
+//   if (dbDataOne.length > 0) {
+//     dbDataOne.map((track, i) => {
+//       if (i !== dbDataOne.length - 1) {
+//         idsList += `${track.id},`;
+//       } else {
+//         idsList += track.id;
+//       }
+//     });
+//     axios.get(`/spotify/features/${idsList}`)
+//       .then((resFeatData) => {
+//         getAverages(resFeatData.data.audio_features, setTheoryDataOne);
+//       })
+//       .catch((err) => {
+//         console.log('err getting features', err);
+//       });
+//   }
+// }, [dbDataOne, quantityOne]);
