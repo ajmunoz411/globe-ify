@@ -16,10 +16,10 @@ const Map = (props) => {
     height: '550px',
   };
 
-  const [center, setCenter] = useState({
+  const center = {
     lat: 39.73,
     lng: -104.99,
-  });
+  };
 
   const { isLoaded } = useJsApiLoader({
     id: 'google-map-script',
@@ -29,14 +29,10 @@ const Map = (props) => {
   const onMapClick = (country) => {
     if (clicks === 0) {
       setCountryOne(country);
+      setClicks(1);
     } else {
       setCountryTwo(country);
     }
-    setClicks(1);
-    setCenter({
-      lat: country.pos[0],
-      lng: country.pos[1],
-    });
   };
 
   return isLoaded ? (

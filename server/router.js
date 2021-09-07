@@ -9,6 +9,6 @@ router
   .get('/track', spothelpers.getTrack)
   .get('/list/tracks/:list', spothelpers.getTracksList)
   .get('/features/:list', spothelpers.getTracksFeatures)
-  .get('/auth', spothelpers.getAuth);
+  // .get('/auth', spothelpers.getAuth);
 
 module.exports = router;

@@ -27,6 +27,7 @@ const App = () => {
   const getCountries = (country, quantity, setter) => {
     axios.get(`/spotify/db/${country.code}/${quantity}`)
       .then((dbData) => {
+        console.log('dbdata', dbData.data);
         setter([...dbData.data]);
       })
       .catch((err) => {
@@ -45,6 +46,7 @@ const App = () => {
   const resetCountries = () => {
     setCountryOne({ name: 'World', code: 'global' });
     setCountryTwo(null);
+    setDbDataTwo([]);
     setClicks(0);
   };
 
