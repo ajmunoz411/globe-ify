@@ -13,6 +13,8 @@ const Theory = ({ data }) => (
       ))}
     </>
   ) : null
+  // console.log('data', data);
+  // return null;
 );
 
 export default Theory;
