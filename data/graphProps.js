@@ -2,7 +2,7 @@ const graphProps = {
   singleLabels: [
     'Acousticness',
     'Danceability',
-    'Duration(mins)',
+    'Duration',
     'Energy',
     'Instrumentalness',
     'Liveness',
@@ -15,7 +15,7 @@ const graphProps = {
   doubleLabels: [
     'Acousticness 1',
     'Danceability 1',
-    'Duration(mins) 1',
+    'Duration 1',
     'Energy 1',
     'Instrumentalness 1',
     'Liveness 1',
@@ -25,7 +25,7 @@ const graphProps = {
     'Valence 1',
     'Acousticness 2',
     'Danceability 2',
-    'Duration(mins) 2',
+    'Duration 2',
     'Energy 2',
     'Instrumentalness 2',
     'Liveness 2',
