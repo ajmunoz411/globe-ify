@@ -3,17 +3,14 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Theory from './Theory';
 import Graph from './Graph';
-import graphProps from '../../../data/graphProps';
+import { dataHelp, theoryHelp } from '../../../data/graphDataHelpers';
 
 const Analysis = (props) => {
   const {
     dbDataOne,
     quantityOne,
-    // setTheoryDataOne,
     dbDataTwo,
     quantityTwo,
-    // setTheoryDataTwo,
-    clicks,
   } = props;
 
   const [featDataOne, setFeatDataOne] = useState([]);
@@ -21,6 +18,46 @@ const Analysis = (props) => {
 
   const [theoryDataOne, setTheoryDataOne] = useState([]);
   const [theoryDataTwo, setTheoryDataTwo] = useState([]);
+
+  const formatData = (totalsObj, quantity) => {
+    const graphFeats = {};
+    const theoryFeats = {};
+
+    Object.entries(totalsObj).forEach(([feature, total]) => {
+      if (feature === 'duration') {
+        const avgMs = dataHelp.average(total, quantity);
+        const minutes = dataHelp.msToMins(avgMs);
+        theoryFeats.duration = theoryHelp.duration(minutes);
+        graphFeats.duration = dataHelp.minsToPercentage(minutes);
+      } else if (feature === 'loudness') {
+        const avgDb = dataHelp.average(total, quantity);
+        theoryFeats.loudness = theoryHelp.loudness(avgDb);
+        graphFeats.loudness = dataHelp.dbToPercentage(avgDb);
+      } else if (feature === 'key') {
+        const avgKey = dataHelp.roundedAverage(total, quantity);
+        theoryFeats.key = dataHelp.keyToString(avgKey);
+      } else if (feature === 'meter') {
+        theoryFeats.meter = dataHelp.average(total, quantity);
+      } else if (feature === 'mode') {
+        const avgMode = dataHelp.roundedAverage(total, quantity);
+        theoryFeats.mode = dataHelp.modeToString(avgMode);
+      } else if (feature === 'tempo') {
+        theoryFeats.tempo = dataHelp.roundedAverage(total, quantity);
+        graphFeats[feature] = dataHelp.average(total, quantity) / 3;
+      } else if (feature === 'instrumentalness') {
+        const avgInst = dataHelp.average(total, quantity);
+        graphFeats.instrumentalness = avgInst * 10000;
+      } else {
+        const avgFeat = dataHelp.average(total, quantity);
+        graphFeats[feature] = avgFeat * 100;
+      }
+    });
+
+    return {
+      graph: [...Object.values(graphFeats)],
+      theory: [...Object.entries(theoryFeats)],
+    };
+  };
 
   const getAverages = (tracks, quantity, featSetter, theorySetter) => {
     const featuresTotals = {
@@ -47,43 +84,9 @@ const Analysis = (props) => {
       });
     });
 
-    const graphFeats = {};
-    const theoryFeats = {};
-
-    Object.entries(featuresTotals).forEach(([feature, value]) => {
-      // convert to minutes / 6 * 100 (so 100% is 6 minutes)
-      if (feature === 'duration') {
-        const minutes = value / quantity / 1000 / 60;
-        const min = Math.floor(minutes);
-        const sec = Math.round((minutes - Math.floor(minutes)) * 60);
-        theoryFeats[feature] = `${min} minutes, ${sec} seconds`;
-        graphFeats[feature] = (minutes / 6) * 100;
-      // convert db to percentage (p = (10 ^ X/10) * 100)
-      } else if (feature === 'loudness') {
-        const decibel = (value / quantity).toFixed(2);
-        theoryFeats[feature] = `${decibel} db`;
-        graphFeats[feature] = 10 ** ((value / quantity) / 10) * 100;
-        // round to nearest whole
-      } else if (feature === 'key') {
-        theoryFeats[feature] = graphProps.keys[Math.round(value / quantity)];
-      } else if (feature === 'meter') {
-        theoryFeats[feature] = value / quantity;
-        // convert to percentage using 300 bpm as 100%
-      } else if (feature === 'mode') {
-        theoryFeats[feature] = graphProps.modes[Math.round(value / quantity)];
-      } else if (feature === 'tempo') {
-        theoryFeats[feature] = Math.round(value / quantity);
-        graphFeats[feature] = (value / quantity) / 3;
-      } else if (feature === 'instrumentalness') {
-        graphFeats[feature] = (value / quantity) * 10000;
-      } else {
-        graphFeats[feature] = (value / quantity) * 100;
-      }
-    });
-
-    featSetter(([...Object.values(graphFeats)]));
-    const theoryArr = Object.entries(theoryFeats);
-    theorySetter([...theoryArr]);
+    const { graph, theory } = formatData(featuresTotals, quantity);
+    featSetter(graph);
+    theorySetter(theory);
   };
 
   useEffect(() => {
@@ -98,22 +101,12 @@ const Analysis = (props) => {
     }
   }, [dbDataTwo]);
 
-  let render = false;
-  if ((clicks === 0 && featDataOne.length > 0) || (clicks > 0 && featDataTwo.length > 0)) {
-    render = true;
-  }
-
-  return (render) ? (
+  return (
     <>
       <Row className="theory-row">
         <Col>
           <Theory data={theoryDataOne} />
         </Col>
-        {/* {countryTwo && (
-          <Col>
-            <Theory data={theoryDataTwo} />
-          </Col>
-        )} */}
         {theoryDataTwo.length && (
           <Col>
             <Theory data={theoryDataTwo} />
@@ -124,19 +117,13 @@ const Analysis = (props) => {
         <Col>
           <h4>Audio Features</h4>
           <Graph
-            // dbDataOne={dbDataOne}
-            // quantityOne={quantityOne}
-            // // setTheoryDataOne={setTheoryDataOne}
-            // dbDataTwo={dbDataTwo}
-            // quantityTwo={quantityTwo}
-            // setTheoryDataTwo={setTheoryDataTwo}
             featDataOne={featDataOne}
             featDataTwo={featDataTwo}
           />
         </Col>
       </Row>
     </>
-  ) : <></>;
+  );
 };
 
 export default Analysis;

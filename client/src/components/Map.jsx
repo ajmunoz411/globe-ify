@@ -27,9 +27,9 @@ const Map = (props) => {
   });
 
   const onMapClick = (country) => {
-    if (clicks === 0) {
+    if (!clicks) {
       setCountryOne(country);
-      setClicks(1);
+      setClicks((prevState) => !prevState);
     } else {
       setCountryTwo(country);
     }

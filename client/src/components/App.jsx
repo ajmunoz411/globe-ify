@@ -6,51 +6,24 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import Map from './Map';
-// import Graph from './Graph';
 import QuantityDropdown from './QuantityDropdown';
 import Songs from './Songs';
-// import Theory from './Theory';
 import Analysis from './Analysis';
 
 const App = () => {
-  const getCountries = async (country, quantity, setter) => {
-    // axios.get(`/spotify/db/${country.code}/${quantity}`)
-    //   .then((dbData) => {
-    //     setter([...dbData.data]);
-    //   })
-    //   .catch((err) => {
-    //     console.log(`error getting ${country} tracks`, err);
-    //   });
+  const getCountries = async (country, quantity) => {
     const tracksList = await axios.get(`/spotify/db/${country.code}/${quantity}`);
-    // console.log('tracksList.data', tracksList.data);
     return tracksList.data;
   };
   const [countryOne, setCountryOne] = useState({ name: 'World', code: 'global' });
-  // const [dbDataOne, setDbDataOne] = useState(() => getCountries({ code: 'global' }, 5));
   const [dbDataOne, setDbDataOne] = useState([]);
   const [quantityOne, setQuantityOne] = useState(5);
-  // const [theoryDataOne, setTheoryDataOne] = useState([]);
 
   const [countryTwo, setCountryTwo] = useState(null);
   const [dbDataTwo, setDbDataTwo] = useState([]);
   const [quantityTwo, setQuantityTwo] = useState(5);
-  // const [theoryDataTwo, setTheoryDataTwo] = useState([]);
 
-  const [clicks, setClicks] = useState(0);
-
-  console.log('APP FIRING');
-  // useEffect(() => {
-  //   getCountries(countryOne, quantityOne, setDbDataOne);
-  // }, [countryOne, quantityOne]);
-  useEffect(() => {
-    console.log('dbDataOne', dbDataOne);
-    console.log('dbDataTwo', dbDataTwo);
-  }, [dbDataOne, dbDataTwo]);
-
-  useEffect(() => {
-    console.log('countryOne', countryOne);
-    console.log('countryTwo', countryTwo);
-  }, [countryOne, countryTwo]);
+  const [clicks, setClicks] = useState(false);
 
   useEffect(async () => {
     const data = await getCountries(countryOne, quantityOne);
@@ -68,18 +41,10 @@ const App = () => {
     setCountryOne({ name: 'World', code: 'global' });
     setCountryTwo(null);
     setDbDataTwo([]);
-    // setClicks(0);
+    setClicks(false);
   };
 
-  // let render = false;
-  // if (!countryTwo && dbDataOne.length > 0) {
-  //   render = true;
-  // } else if (countryTwo && dbDataTwo.length > 0) {
-  //   render = true;
-  // }
-
-  // return (render) ? (
-    return (
+  return (
     <>
       <Container fluid className="main-container">
         <Row className="title-row">
@@ -128,42 +93,15 @@ const App = () => {
             </Col>
           )}
         </Row>
-        {/* <Row className="theory-row">
-          <Col>
-            <Theory data={theoryDataOne} />
-          </Col>
-          {countryTwo && (
-            <Col>
-              <Theory data={theoryDataTwo} />
-            </Col>
-          )}
-        </Row>
-        <Row className="features-row">
-          <Col>
-            <h4>Audio Features</h4>
-            <Graph
-              dbDataOne={dbDataOne}
-              quantityOne={quantityOne}
-              setTheoryDataOne={setTheoryDataOne}
-              dbDataTwo={dbDataTwo}
-              quantityTwo={quantityTwo}
-              setTheoryDataTwo={setTheoryDataTwo}
-            />
-          </Col>
-        </Row> */}
         <Analysis
           dbDataOne={dbDataOne}
           quantityOne={quantityOne}
-          // setTheoryDataOne={setTheoryDataOne}
           dbDataTwo={dbDataTwo}
           quantityTwo={quantityTwo}
-          // setTheoryDataTwo={setTheoryDataTwo}
-          clicks={clicks}
         />
       </Container>
     </>
-    );
-  // ) : <div>Loading</div>;
+  );
 };
 
 export default App;
