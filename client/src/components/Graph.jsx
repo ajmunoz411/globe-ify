@@ -46,21 +46,26 @@ const Graph = (props) => {
     Object.entries(featuresTotals).forEach(([feature, value]) => {
       // convert to minutes / 6 * 100 (so 100% is 6 minutes)
       if (feature === 'duration') {
-        const bpm = value / quantity / 1000 / 60;
-        theoryFeats[feature] = bpm;
-        graphFeats[feature] = (bpm / 6) * 100;
+        const minutes = value / quantity / 1000 / 60;
+        const min = Math.floor(minutes);
+        const sec = Math.round((minutes - Math.floor(minutes)) * 60);
+        theoryFeats[feature] = `${min} minutes, ${sec} seconds`;
+        graphFeats[feature] = (minutes / 6) * 100;
       // convert db to percentage (p = (10 ^ X/10) * 100)
       } else if (feature === 'loudness') {
-        theoryFeats[feature] = value / quantity;
+        const decibel = (value / quantity).toFixed(2);
+        theoryFeats[feature] = `${decibel} db`;
         graphFeats[feature] = 10 ** ((value / quantity) / 10) * 100;
         // round to nearest whole
       } else if (feature === 'key') {
-        theoryFeats[feature] = Math.round(value / quantity);
-      } else if (feature === 'meter' || feature === 'mode') {
+        theoryFeats[feature] = graphProps.keys[Math.round(value / quantity)];
+      } else if (feature === 'meter') {
         theoryFeats[feature] = value / quantity;
         // convert to percentage using 300 bpm as 100%
+      } else if (feature === 'mode') {
+        theoryFeats[feature] = graphProps.modes[Math.round(value / quantity)];
       } else if (feature === 'tempo') {
-        theoryFeats[feature] = value / quantity;
+        theoryFeats[feature] = Math.round(value / quantity);
         graphFeats[feature] = (value / quantity) / 3;
       } else if (feature === 'instrumentalness') {
         graphFeats[feature] = (value / quantity) * 10000;
