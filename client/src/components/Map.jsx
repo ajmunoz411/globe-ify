@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
 import { countries } from '../../../data/countryCodeCoord';
 import config from '../../../config';
@@ -27,9 +27,9 @@ const Map = (props) => {
   });
 
   const onMapClick = (country) => {
-    if (clicks === 0) {
+    if (!clicks) {
       setCountryOne(country);
-      setClicks(1);
+      setClicks((prevState) => !prevState);
     } else {
       setCountryTwo(country);
     }

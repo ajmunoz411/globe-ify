@@ -16,7 +16,7 @@ app.use(cors());
 app.use('/spotify', router);
 
 app.listen(port, () => {
-  console.log(`express server listening at port: ${port}`);
+  console.log(`App is being served at port: ${port}`);
 });
 
 app.use(express.static(path.join(__dirname, '..', 'client/dist')));

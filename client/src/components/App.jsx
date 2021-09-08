@@ -6,48 +6,42 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import Map from './Map';
-import Graph from './Graph';
 import QuantityDropdown from './QuantityDropdown';
 import Songs from './Songs';
-import Theory from './Theory';
+import Analysis from './Analysis';
 
 const App = () => {
+  const getCountries = async (country, quantity) => {
+    const tracksList = await axios.get(`/spotify/db/${country.code}/${quantity}`);
+    return tracksList.data;
+  };
   const [countryOne, setCountryOne] = useState({ name: 'World', code: 'global' });
   const [dbDataOne, setDbDataOne] = useState([]);
   const [quantityOne, setQuantityOne] = useState(5);
-  const [theoryDataOne, setTheoryDataOne] = useState([]);
 
   const [countryTwo, setCountryTwo] = useState(null);
   const [dbDataTwo, setDbDataTwo] = useState([]);
   const [quantityTwo, setQuantityTwo] = useState(5);
-  const [theoryDataTwo, setTheoryDataTwo] = useState([]);
 
-  const [clicks, setClicks] = useState(0);
+  const [clicks, setClicks] = useState(false);
 
-  const getCountries = (country, quantity, setter) => {
-    axios.get(`/spotify/db/${country.code}/${quantity}`)
-      .then((dbData) => {
-        console.log('dbdata', dbData.data);
-        setter([...dbData.data]);
-      })
-      .catch((err) => {
-        console.log(`error getting ${country} tracks`, err);
-      });
-  };
-
-  useEffect(() => {
-    getCountries(countryOne, quantityOne, setDbDataOne);
+  useEffect(async () => {
+    const data = await getCountries(countryOne, quantityOne);
+    setDbDataOne(data);
   }, [countryOne, quantityOne]);
 
-  useEffect(() => {
-    if (countryTwo) { getCountries(countryTwo, quantityTwo, setDbDataTwo); }
+  useEffect(async () => {
+    if (countryTwo) {
+      const data = await getCountries(countryTwo, quantityTwo);
+      setDbDataTwo(data);
+    }
   }, [countryTwo, quantityTwo]);
 
   const resetCountries = () => {
     setCountryOne({ name: 'World', code: 'global' });
     setCountryTwo(null);
     setDbDataTwo([]);
-    setClicks(0);
+    setClicks(false);
   };
 
   return (
@@ -99,29 +93,12 @@ const App = () => {
             </Col>
           )}
         </Row>
-        <Row className="theory-row">
-          <Col>
-            <Theory data={theoryDataOne} />
-          </Col>
-          {countryTwo && (
-            <Col>
-              <Theory data={theoryDataTwo} />
-            </Col>
-          )}
-        </Row>
-        <Row className="features-row">
-          <Col>
-            <h4>Audio Features</h4>
-            <Graph
-              dbDataOne={dbDataOne}
-              quantityOne={quantityOne}
-              setTheoryDataOne={setTheoryDataOne}
-              dbDataTwo={dbDataTwo}
-              quantityTwo={quantityTwo}
-              setTheoryDataTwo={setTheoryDataTwo}
-            />
-          </Col>
-        </Row>
+        <Analysis
+          dbDataOne={dbDataOne}
+          quantityOne={quantityOne}
+          dbDataTwo={dbDataTwo}
+          quantityTwo={quantityTwo}
+        />
       </Container>
     </>
   );

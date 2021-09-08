@@ -2,7 +2,7 @@ const graphProps = {
   singleLabels: [
     'Acousticness',
     'Danceability',
-    'Duration(mins)',
+    'Duration',
     'Energy',
     'Instrumentalness',
     'Liveness',
@@ -15,7 +15,7 @@ const graphProps = {
   doubleLabels: [
     'Acousticness 1',
     'Danceability 1',
-    'Duration(mins) 1',
+    'Duration 1',
     'Energy 1',
     'Instrumentalness 1',
     'Liveness 1',
@@ -25,7 +25,7 @@ const graphProps = {
     'Valence 1',
     'Acousticness 2',
     'Danceability 2',
-    'Duration(mins) 2',
+    'Duration 2',
     'Energy 2',
     'Instrumentalness 2',
     'Liveness 2',
@@ -70,26 +70,6 @@ const graphProps = {
     'rgba(80, 203, 210, 0.3)',
     'rgba(241, 234, 200, 0.3)',
   ],
-
-  keys: {
-    0: 'C',
-    1: 'C#',
-    2: 'D',
-    3: 'D#',
-    4: 'E',
-    5: 'F',
-    6: 'F#',
-    7: 'G',
-    8: 'G#',
-    9: 'A',
-    10: 'A#',
-    11: 'B',
-  },
-
-  modes: {
-    0: 'Minor',
-    1: 'Major',
-  },
 };
 
 module.exports = graphProps;
