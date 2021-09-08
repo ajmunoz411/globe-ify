@@ -56,7 +56,7 @@ const insertRanking = async (trackObj, countryCode) => {
 
 const getTracks = async (countryCode, quantity) => {
   const queryStr = `
-    SELECT rank, streams, name, artist, url, spotify_id, danceability, energy, key, loudness, mode, speechiness, instrumentalness, liveness, valence, tempo, duration, meter
+    SELECT rank, streams, name, artist, url, spotify_id, danceability, energy, key, loudness, mode, speechiness, acousticness, instrumentalness, liveness, valence, tempo, duration, meter
     FROM globeify.rankings
     INNER JOIN globeify.tracks ON globeify.rankings.track_id=globeify.tracks.id
     WHERE country_id=(SELECT id FROM globeify.countries WHERE code='${countryCode}')

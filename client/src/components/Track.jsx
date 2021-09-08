@@ -4,12 +4,15 @@ import React from 'react';
 const Track = ({ song, setPlayingTrack, playTrackId }) => {
   const {
     rank,
-    name,
-    artist,
     streams,
     url,
     spotify_id,
   } = song;
+
+  const removeQuotes = (string) => string.replace(/^"(.*)"$/, '$1');
+
+  const name = removeQuotes(song.name);
+  const artist = removeQuotes(song.artist);
 
   let player;
   if (playTrackId !== spotify_id) {

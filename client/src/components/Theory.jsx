@@ -6,8 +6,8 @@ const Theory = ({ data }) => (
       <h4>Music Theory</h4>
       {data.map((theory) => (
         <div key={theory}>
-          {theory[0]}
-          -
+          {theory[0][0].toUpperCase() + theory[0].slice(1)}
+          {': '}
           {theory[1]}
         </div>
       ))}
