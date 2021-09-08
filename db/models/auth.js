@@ -19,19 +19,10 @@ const getAuth = async () => {
     },
     data,
   };
-  // axios(options)
-  //   .then((response) => {
-  //     res.status(200).send(response.data);
-  //   })
-  //   .catch((err) => {
-  //     res.status(400).send(err);
-  //   });
   const auth = await axios(options);
-  config.TOKEN = auth.data.access_token;
+  return auth.data.access_token;
 };
 
-// module.exports = {
-//   getAuth,
-// };
-
-getAuth();
+module.exports = {
+  getAuth,
+};

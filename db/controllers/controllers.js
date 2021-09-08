@@ -1,4 +1,4 @@
-const { insertTrack, insertRanking, getTracks } = require('../models/models');
+const { getTracks } = require('../models/models');
 const { getAuth } = require('../models/auth');
 
 const controllers = {

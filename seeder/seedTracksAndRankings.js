@@ -135,6 +135,4 @@ const startIntervalSeed = () => {
   }, 1000);
 };
 
-// startIntervalSeed();
-
 module.exports = startIntervalSeed;
