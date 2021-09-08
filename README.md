@@ -5,9 +5,7 @@ A global music analysis application to compare listening preferences across coun
 Globe-ify allows users to select any country via an interactive map, see that country's top streamed songs for the week, and listen to a snippet of any song. The Music Theory section displays averaged values for song duration, key, loudness, mode, tempo, and meter, based on the currently displayed songs. The Audio Features graph charts out audio analysis averages for acousticness, danceability, duration, energy, instrumentalness, liveness, loudness, speechiness, tempo, and valence. Selecting a second country will display that country's top songs and Music Theory data side by side with the first, and will add that country's audio analysis to the Audio Features graph.
 
 First version created in 2 days for a coding challenge, will be updating from time to time.
-![img1](img/globeifyimg3.png)
-![img2](img/globeifyimg1.png)
-![img3](img/globeifyimg2.png)
+![globeifydemoimg](img/globeifyimg4.png)
 
 ## Getting Started
 
