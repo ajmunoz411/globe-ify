@@ -35,9 +35,7 @@ const Graph = (props) => {
   };
 
   return (featData.length > 0) ? (
-    <>
-      <PolarArea data={graphData} />
-    </>
+    <PolarArea data={graphData} />
   ) : null;
 };
 
