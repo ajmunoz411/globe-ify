@@ -25,11 +25,9 @@ const Track = ({ song, setPlayingTrack, playTrackId }) => {
 
   return (
     <div className="track-info">
-      <div>
-        <div>{rank}. <b>{name}</b> - <em>{artist}</em></div>
-        <div>{streams.toLocaleString()} Streams</div>
-        <div>Listen: <i className="far fa-play-circle" onClick={() => setPlayingTrack(spotify_id)} onKeyDown={() => setPlayingTrack(spotify_id)} role="button" tabIndex="0" label="play" /></div>
-      </div>
+      <div>{rank}. <b>{name}</b> - <em>{artist}</em></div>
+      <div>{streams.toLocaleString()} Streams</div>
+      <div>Listen: <i className="far fa-play-circle" onClick={() => setPlayingTrack(spotify_id)} onKeyDown={() => setPlayingTrack(spotify_id)} role="button" tabIndex="0" label="play" /></div>
       {player}
     </div>
   );
