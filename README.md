@@ -18,6 +18,7 @@ First version created in 2 days for a coding challenge, will be updating from ti
 - Copy `config.example.js` and rename to `config.js`
 - Fill in your Google Maps API key, Spotify ID, Spotify Security code, and Spotify Token (`GET request to '/spotify/auth'` will return a new token if needed`)
 - Download chart CSV data from `https://spotifycharts.com/regional/global/weekly/latest` and place in `data/csv`
+- Run `schema.sql` file using `psql -U postgres -h 127.0.0.1 -f db/schema.sql`
 - Run `npm run seed` to transform and seed the csv data into the PostgreSQL database
 - Run `npm run build` to transpile React components
 - Run `npm start` to start Express server and serve the app
